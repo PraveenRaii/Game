@@ -57,6 +57,18 @@ export const CarRacing = ({ setCurrentView }) => {
   const requestRef = useRef(null);
   const frameCountRef = useRef(0);
   const isPlayingRef = useRef(false);
+  const roadRef = useRef(null);
+  const touchStartPos = useRef({ x: 0, y: 0, time: 0 });
+  const laneIndexRef = useRef(laneIndex);
+  const gameStateRef = useRef(gameState);
+
+  useEffect(() => {
+    laneIndexRef.current = laneIndex;
+  }, [laneIndex]);
+
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
 
   // Best score from local storage
   const [bestDistance, setBestDistance] = useState(() => {
@@ -103,6 +115,57 @@ export const CarRacing = ({ setCurrentView }) => {
     soundEffects.playCarBoost();
     addToast({ title: '⚡ NITRO ACTIVE!', message: 'Maximum speed & temporary invulnerability!', type: 'info', duration: 2000 });
   }, [gameState, nitro, isNitroActive, addToast]);
+
+  // Mobile finger touch & swipe handling (no button tapping required)
+  const steerToFinger = useCallback((clientX) => {
+    if (gameStateRef.current !== 'playing' || !roadRef.current) return;
+    const rect = roadRef.current.getBoundingClientRect();
+    const relativeX = (clientX - rect.left) / rect.width;
+    let targetLane = 1;
+    if (relativeX < 0.35) targetLane = 0;
+    else if (relativeX > 0.65) targetLane = 2;
+    else targetLane = 1;
+
+    if (targetLane !== laneIndexRef.current) {
+      soundEffects.playCarMove();
+      setLaneIndex(targetLane);
+    }
+  }, []);
+
+  const handleTouchStart = useCallback((e) => {
+    if (gameStateRef.current !== 'playing') return;
+    const touch = e.touches[0];
+    touchStartPos.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      time: Date.now(),
+    };
+    steerToFinger(touch.clientX);
+  }, [steerToFinger]);
+
+  const handleTouchMove = useCallback((e) => {
+    if (gameStateRef.current !== 'playing') return;
+    const touch = e.touches[0];
+    steerToFinger(touch.clientX);
+  }, [steerToFinger]);
+
+  const handleTouchEnd = useCallback((e) => {
+    if (gameStateRef.current !== 'playing') return;
+    const touch = e.changedTouches[0];
+    const deltaY = touch.clientY - touchStartPos.current.y;
+    const deltaX = touch.clientX - touchStartPos.current.x;
+    const duration = Date.now() - touchStartPos.current.time;
+
+    // Upward flick / swipe activates Nitro
+    if (deltaY < -40 && Math.abs(deltaY) > Math.abs(deltaX) && duration < 400) {
+      triggerNitro();
+    }
+  }, [triggerNitro]);
+
+  const handleMouseDown = useCallback((e) => {
+    if (gameStateRef.current !== 'playing') return;
+    steerToFinger(e.clientX);
+  }, [steerToFinger]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -391,8 +454,15 @@ export const CarRacing = ({ setCurrentView }) => {
               </div>
             </div>
 
-            {/* 3D PERSPECTIVE HIGHWAY CANVAS */}
-            <div className="relative w-full aspect-[9/14] sm:aspect-[9/13] max-w-[340px] sm:max-w-[380px] mx-auto rounded-2xl bg-gradient-to-b from-[#090b16] via-[#0d1024] to-[#080914] border-2 border-cyan-500/40 shadow-inner overflow-hidden select-none">
+            {/* 3D PERSPECTIVE HIGHWAY CANVAS (Finger Drag & Touch-enabled) */}
+            <div
+              ref={roadRef}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              onMouseDown={handleMouseDown}
+              className="relative w-full aspect-[9/14] sm:aspect-[9/13] max-w-[340px] sm:max-w-[380px] mx-auto rounded-2xl bg-gradient-to-b from-[#090b16] via-[#0d1024] to-[#080914] border-2 border-cyan-500/40 shadow-inner overflow-hidden select-none touch-none cursor-pointer"
+            >
               {/* Cyber Grid Horizons */}
               <div
                 className="absolute inset-0 opacity-20 pointer-events-none"
@@ -583,29 +653,23 @@ export const CarRacing = ({ setCurrentView }) => {
               )}
             </div>
 
-            {/* MOBILE TOUCH CONTROLS */}
-            <div className="grid grid-cols-3 gap-2 mt-4">
-              <button
-                onClick={() => moveLane('left')}
-                className="py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs flex items-center justify-center gap-1 active:scale-95 transition-all border border-white/10"
-              >
-                <ChevronLeft className="w-4 h-4" /> Left
-              </button>
-
+            {/* MOBILE CONTROLS (FINGER STEER + NITRO) */}
+            <div className="mt-4 space-y-2.5">
+              {/* Nitro Boost Button */}
               <button
                 onClick={triggerNitro}
                 disabled={nitro < 30 || isNitroActive}
-                className="py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-bold text-xs flex items-center justify-center gap-1 active:scale-95 transition-all disabled:opacity-40"
+                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 text-black font-['Orbitron'] font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg shadow-cyan-500/25 disabled:opacity-40"
               >
-                <Zap className="w-4 h-4 fill-current" /> Nitro
+                <Zap className="w-4 h-4 fill-current" />
+                <span>{isNitroActive ? '⚡ NITRO ACTIVE!' : 'NITRO BOOST (OR SWIPE UP ↑)'}</span>
               </button>
 
-              <button
-                onClick={() => moveLane('right')}
-                className="py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs flex items-center justify-center gap-1 active:scale-95 transition-all border border-white/10"
-              >
-                Right <ChevronRight className="w-4 h-4" />
-              </button>
+              {/* Mobile Finger Touch Visual Pill */}
+              <div className="py-2.5 px-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center gap-2 text-center text-xs text-cyan-300">
+                <span className="text-base animate-pulse">👆</span>
+                <span className="font-semibold">Slide finger Left &amp; Right across road to steer</span>
+              </div>
             </div>
           </div>
         </div>
@@ -647,12 +711,16 @@ export const CarRacing = ({ setCurrentView }) => {
             </h4>
             <div className="space-y-2 text-xs text-slate-300">
               <div className="flex items-center justify-between p-2 rounded-lg bg-white/5">
-                <span>Steer Left / Right</span>
+                <span>Mobile Touch</span>
+                <span className="font-mono text-cyan-300 bg-white/5 px-2 py-0.5 rounded">👆 Slide Finger Left / Right</span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-white/5">
+                <span>Keyboard Steer</span>
                 <span className="font-mono text-cyan-300 bg-white/5 px-2 py-0.5 rounded">← / → or A / D</span>
               </div>
               <div className="flex items-center justify-between p-2 rounded-lg bg-white/5">
                 <span>Nitro Boost</span>
-                <span className="font-mono text-purple-300 bg-white/5 px-2 py-0.5 rounded">SPACE or W / ↑</span>
+                <span className="font-mono text-purple-300 bg-white/5 px-2 py-0.5 rounded">Swipe Up ↑ or SPACE / W</span>
               </div>
               <div className="flex items-center justify-between p-2 rounded-lg bg-white/5">
                 <span>Collectibles</span>
