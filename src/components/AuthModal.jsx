@@ -222,10 +222,6 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
               </div>
             </div>
 
-            <div className="p-2.5 rounded-xl bg-purple-950/30 border border-purple-500/20 text-[11px] text-purple-300">
-              💡 <strong>Admin Access:</strong> Email <code className="bg-black/40 px-1 py-0.5 rounded text-white">praveen12342020@gmail.com</code> (or <code className="bg-black/40 px-1 py-0.5 rounded text-white">admin</code>) and password <code className="bg-black/40 px-1 py-0.5 rounded text-white">praveen@2020</code>
-            </div>
-
             <button
               type="submit"
               className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 text-black font-bold text-sm shadow-lg shadow-cyan-500/25 hover:shadow-cyan-400/40 hover:scale-[1.01] active:scale-95 transition-all"
