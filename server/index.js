@@ -2,6 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 import { User } from './models/User.js';
 import { Game } from './models/Game.js';
 import { Score } from './models/Score.js';
@@ -103,7 +106,6 @@ const seedDatabase = async () => {
       await Game.findOneAndUpdate({ gameId: g.gameId }, { $setOnInsert: g }, { upsert: true });
     }
     console.log('Default games (including Car Racing) synced into MongoDB');
-    }
   } catch (err) {
     console.error('Seeding error:', err);
   }
@@ -473,6 +475,22 @@ app.get('/api/admin/stats', async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 });
+
+// Serve static production build (Vite dist) if available
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const distPath = path.resolve(__dirname, '../dist');
+
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+
+  app.use((req, res, next) => {
+    if (req.method === 'GET' && !req.path.startsWith('/api')) {
+      return res.sendFile(path.resolve(distPath, 'index.html'));
+    }
+    next();
+  });
+}
 
 // Start listening
 app.listen(PORT, () => {
