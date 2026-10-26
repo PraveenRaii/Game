@@ -1,0 +1,84 @@
+# ==========================================
+# GameZone - .gitignore
+# ==========================================
+
+# 1. Environment Variables & Secrets (CRITICAL)
+# Protects your live MongoDB Atlas connection credentials & private keys
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+!*.env.example
+*.pem
+*.key
+*.cert
+secrets.json
+
+# 2. Dependencies
+# Do not commit massive packages folder (installed via npm install)
+node_modules/
+jspm_packages/
+.pnp
+.pnp.js
+
+# 3. Production Build Outputs
+# Compiled assets (generated automatically via npm run build)
+dist/
+dist-ssr/
+build/
+out/
+coverage/
+.nyc_output/
+
+# 4. Logs & Debugging Files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# 5. Build Caches & Temporary Files
+.vite/
+.cache/
+.parcel-cache/
+.turbo/
+.eslintcache
+.stylelintcache
+.oxlintcache
+*.tmp
+*.bak
+*.temp
+tmp/
+temp/
+
+# 6. IDE & Editor Specific Files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.sublime-project
+*.sublime-workspace
+
+# 7. Operating System Artifacts (Windows & macOS)
+.DS_Store
+.DS_Store?
+._*
+[Tt]humbs.db
+[Ee]hthumbs.db
+[Dd]esktop.ini
+
+# Windows System Recycles
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
