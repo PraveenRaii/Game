@@ -4,7 +4,7 @@ A modern, responsive, and full-stack gaming platform built with **React 19**, **
 
 ---
 
-## 🌟 What's New: Database, Admin Console, Themes & Profile Photos
+## 🌟 Features: Database, Admin Console, Themes & Profile Photos
 
 ### 1. 🍃 MongoDB Atlas Cloud Database Integration
 - **Database Connection**: Configured and connected to MongoDB Atlas (`gamezone` cluster).
@@ -17,7 +17,7 @@ A modern, responsive, and full-stack gaming platform built with **React 19**, **
 ---
 
 ### 2. 🛡️ Comprehensive Admin Dashboard (`/admin`)
-- Accessible to users with the `admin` role (Default credentials: username `admin`, password `admin`).
+- Accessible to users with the `admin` role (Email: `praveen12342020@gmail.com` / Password: `praveen@2020`).
 - **Overview Analytics**:
   - Live **MongoDB Atlas Connection Status** with pulsing health indicator.
   - Real-time counters for **Total Users**, **Active Games**, and **Leaderboard Scores**.
@@ -26,20 +26,21 @@ A modern, responsive, and full-stack gaming platform built with **React 19**, **
   - **Edit Game**: Update details, categories, and tags on the fly.
   - **Publish / Hide Toggle**: Instantly activate or hide any game from players.
   - **Delete Game**: Remove outdated or retired games.
-- **User Data Management**:
+- **User Data Management & Deletion**:
   - View **All User Data** directly from MongoDB (profile photo, name, username, email, games played, victories, registration date).
   - **Role Management**: Promote players to `admin` or demote to `player` with one click.
-  - **Account Deletion**: Remove accounts with confirmation safeguards.
+  - **Account Deletion**: Delete any user directly from MongoDB Atlas with safe confirmation modal.
 - **Score Moderation**: Inspect recorded scores and remove test entries.
 
 ---
 
 ### 3. 🌗 Dark & Light Theme Across ALL Pages
 - **Global Theme Switcher**: Toggle between Cyberpunk Dark Mode and Sleek Modern Light Mode via the Sun/Moon button in the navigation bar.
-- **Consistent Styling Across All Views**:
-  - **Dark Mode**: Cyberpunk neon accents (cyan `#06b6d4`, purple `#a855f7`, pink `#ec4899`), deep frosted glassmorphism, glowing text, and ambient radial flares.
-  - **Light Mode**: High-contrast modern gaming dashboard with crisp borders, soft elevation shadows, and deep readable slate typography.
-- Persisted automatically in browser preferences.
+- **High-Contrast Light Mode**:
+  - Crisp, dark readable fonts (`#0f172a`, `#1e293b`, `#475569`).
+  - Deep vibrant accent colors for all neon highlights so every word is 100% legible.
+  - White text preserved on dark/gradient buttons.
+- **Dark Mode Guarantee**: Zero changes to dark mode; glowing neon cyberpunk aesthetic preserved.
 
 ---
 
@@ -53,26 +54,7 @@ A modern, responsive, and full-stack gaming platform built with **React 19**, **
 
 ## 🕹️ Interactive Games
 
-### 1. 🔢 Number Guessing Game
-- **3 Difficulty Tiers**: Easy (1–50, 10 attempts), Medium (1–100, 7 attempts), Hard (1–500, 8 attempts).
-- **Dynamic Hints**: `"Too High! 🔻"`, `"Too Low! 🔺"`, `"Correct Guess! 🎉"`, and bonus proximity clues (*"🔥 Super Close!"*).
-- **Visual Fuel Gauge**: Real-time progress bar + heart indicators for remaining attempts.
-- **Validation**: Checks bounds and duplicate guesses.
-
-### 2. ⚔️ Tic-Tac-Toe
-- **3×3 Neon Grid**: Play as **X** or **O**.
-- **Two Modes**: Player vs Computer (AI) or 2-Player Local Pass & Play.
-- **Unbeatable Minimax AI**: Hard mode runs the mathematical Minimax algorithm with alpha-beta pruning.
-- **Winning Line Highlight**: Dynamically illuminates the winning 3-in-a-row combination.
-
-### 3. 🧩 Sliding Number Puzzle
-- **3 Grid Modes**: 3×3 (8 tiles), 4×4 (15 tiles), and 5×5 (24 tiles).
-- **100% Solvable Guarantee**: Inversion parity checking ensures every board is mathematically solvable.
-- **Controls**: Mouse click or **Arrow Keys / WASD** on keyboard.
-- **Smart AI Hint**: Uses Manhattan distance calculation to recommend the best next tile.
-- **Timer & Moves Counter**: Live stopwatch and move tracker.
-
-### 4. 🏎️ Cyber Racer – Car Racing Game
+### 1. 🏎️ Cyber Racer – Car Racing Game
 - **3-Lane Cyber Highway**: Navigate high-speed highway traffic with real-time lane switches.
 - **Dynamic Entities**: Oncoming sports cars, delivery trucks, neon gold coins, nitro turbo canisters, and shield repair pickups.
 - **Interactive Driving Mechanics**:
@@ -82,6 +64,25 @@ A modern, responsive, and full-stack gaming platform built with **React 19**, **
 - **Controls**: Arrow Keys / WASD, Space for Nitro boost, or mobile on-screen buttons.
 - **Difficulty Tiers**: Cruiser (Easy), Neon Pro (Medium), and Cyber Mania (Hard).
 - **Audio & FX**: Engine revs, car move whooshes, coin chimes, turbo sound effects, crash audio, and confetti on record breaks.
+
+### 2. 🔢 Number Guessing Game
+- **3 Difficulty Tiers**: Easy (1–50, 10 attempts), Medium (1–100, 7 attempts), Hard (1–500, 8 attempts).
+- **Dynamic Hints**: `"Too High! 🔻"`, `"Too Low! 🔺"`, `"Correct Guess! 🎉"`, and bonus proximity clues (*"🔥 Super Close!"*).
+- **Visual Fuel Gauge**: Real-time progress bar + heart indicators for remaining attempts.
+- **Validation**: Checks bounds and duplicate guesses.
+
+### 3. ⚔️ Tic-Tac-Toe
+- **3×3 Neon Grid**: Play as **X** or **O**.
+- **Two Modes**: Player vs Computer (AI) or 2-Player Local Pass & Play.
+- **Unbeatable Minimax AI**: Hard mode runs the mathematical Minimax algorithm with alpha-beta pruning.
+- **Winning Line Highlight**: Dynamically illuminates the winning 3-in-a-row combination.
+
+### 4. 🧩 Sliding Number Puzzle
+- **3 Grid Modes**: 3×3 (8 tiles), 4×4 (15 tiles), and 5×5 (24 tiles).
+- **100% Solvable Guarantee**: Inversion parity checking ensures every board is mathematically solvable.
+- **Controls**: Mouse click or **Arrow Keys / WASD** on keyboard.
+- **Smart AI Hint**: Uses Manhattan distance calculation to recommend the best next tile.
+- **Timer & Moves Counter**: Live stopwatch and move tracker.
 
 ---
 
@@ -124,4 +125,7 @@ If you prefer running in two separate terminal windows:
 
 ---
 
-
+## 🔑 Admin Account Credentials
+- **Email**: `praveen12342020@gmail.com`
+- **Username**: `admin`
+- **Password**: `praveen@2020`
