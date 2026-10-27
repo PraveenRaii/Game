@@ -17,9 +17,11 @@ import {
   HelpCircle,
   X,
   Sparkles,
+  Lock,
 } from 'lucide-react';
 import { GameCard } from '../components/GameCard';
 import { ScoreCard } from '../components/ScoreCard';
+import { BrandLogo } from '../components/BrandLogo';
 import { soundEffects } from '../audio/soundEffects';
 import { useGameStats } from '../context/GameStatsContext';
 import { useAuth } from '../context/AuthContext';
@@ -44,6 +46,16 @@ export const Home = ({ setCurrentView, openAuthModal, initialSection }) => {
 
   const handleLaunchGame = (gameId) => {
     soundEffects.playClick();
+    if (currentUser?.isGuest) {
+      soundEffects.playHint(false);
+      addToast({
+        title: 'Sign Up Required 🔒',
+        message: 'Please create an account or sign in to play games!',
+        type: 'info',
+      });
+      openAuthModal('signup');
+      return;
+    }
     setCurrentView(gameId);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -131,86 +143,15 @@ export const Home = ({ setCurrentView, openAuthModal, initialSection }) => {
               transition={{ delay: 0.2, duration: 0.4 }}
               className="lg:col-span-5 flex justify-center"
             >
-              <div className="relative w-full max-w-md aspect-square rounded-3xl surface-card p-6 flex flex-col items-center justify-center border border-[var(--border-color)] overflow-hidden">
+              <div className="relative w-full max-w-md aspect-square rounded-3xl surface-card p-6 sm:p-7 flex flex-col items-center justify-between border border-[var(--border-color)] overflow-hidden shadow-2xl">
                 {/* Geometric decorative elements */}
                 <div className="absolute -top-12 -right-12 w-36 h-36 rounded-full border border-[var(--border-color)] opacity-60 pointer-events-none" />
                 <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full border border-[var(--primary-accent-border)] opacity-40 pointer-events-none" />
                 <div className="absolute top-1/2 left-4 w-2 h-2 rounded-full bg-[var(--primary-accent)]" />
                 <div className="absolute top-1/3 right-6 w-1.5 h-1.5 rounded-full bg-[var(--text-secondary)] opacity-50" />
 
-                {/* SVG Illustration: Controller, Puzzle Tiles & Geometric Shapes */}
-                <svg
-                  viewBox="0 0 320 320"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-full h-full max-w-[280px] drop-shadow-sm"
-                >
-                  {/* Outer Geometric Frame */}
-                  <rect
-                    x="24"
-                    y="24"
-                    width="272"
-                    height="272"
-                    rx="32"
-                    stroke="var(--border-color)"
-                    strokeWidth="1.5"
-                    strokeDasharray="6 6"
-                  />
-
-                  {/* Puzzle Tiles Floating Top */}
-                  <g transform="translate(180, 48)">
-                    <rect width="40" height="40" rx="10" fill="var(--bg-elevated)" stroke="var(--border-color)" strokeWidth="1.5" />
-                    <text x="20" y="25" textAnchor="middle" fill="var(--primary-accent)" fontSize="14" fontFamily="Space Mono" fontWeight="bold">1</text>
-                  </g>
-                  <g transform="translate(228, 48)">
-                    <rect width="40" height="40" rx="10" fill="var(--primary-accent)" />
-                    <text x="20" y="25" textAnchor="middle" fill="var(--btn-text-on-accent)" fontSize="14" fontFamily="Space Mono" fontWeight="bold">2</text>
-                  </g>
-                  <g transform="translate(228, 96)">
-                    <rect width="40" height="40" rx="10" fill="var(--bg-elevated)" stroke="var(--border-color)" strokeWidth="1.5" />
-                    <text x="20" y="25" textAnchor="middle" fill="var(--text-primary)" fontSize="14" fontFamily="Space Mono" fontWeight="bold">3</text>
-                  </g>
-
-                  {/* Main Gaming Controller Silhouette in Lime & Charcoal */}
-                  <g transform="translate(56, 120)">
-                    {/* Controller Body */}
-                    <path
-                      d="M36 28 C20 28 8 44 14 74 L26 120 C30 134 44 142 58 136 C72 130 84 108 104 108 L104 108 C124 108 136 130 150 136 C164 142 178 134 182 120 L194 74 C200 44 188 28 172 28 C152 28 140 44 104 44 C68 44 56 28 36 28 Z"
-                      fill="var(--bg-elevated)"
-                      stroke="var(--primary-accent)"
-                      strokeWidth="2.5"
-                    />
-
-                    {/* D-Pad */}
-                    <path
-                      d="M50 62 H58 V54 H66 V62 H74 V70 H66 V78 H58 V70 H50 Z"
-                      fill="var(--border-color)"
-                      stroke="var(--border-color)"
-                      strokeWidth="1"
-                    />
-
-                    {/* Action Buttons (A, B, X, Y) with Lime Accent */}
-                    <circle cx="140" cy="66" r="4.5" fill="var(--primary-accent)" />
-                    <circle cx="152" cy="56" r="4.5" fill="var(--text-secondary)" />
-                    <circle cx="152" cy="76" r="4.5" fill="var(--text-secondary)" />
-                    <circle cx="164" cy="66" r="4.5" fill="var(--text-secondary)" />
-
-                    {/* Analog Sticks */}
-                    <circle cx="78" cy="92" r="12" fill="var(--bg-card)" stroke="var(--border-color)" strokeWidth="2" />
-                    <circle cx="78" cy="92" r="5" fill="var(--primary-accent)" />
-
-                    <circle cx="130" cy="92" r="12" fill="var(--bg-card)" stroke="var(--border-color)" strokeWidth="2" />
-                    <circle cx="130" cy="92" r="5" fill="var(--primary-accent)" />
-                  </g>
-
-                  {/* Modern Racing Car Streak Silhouette */}
-                  <g transform="translate(68, 252)">
-                    <rect x="0" y="0" width="172" height="12" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" strokeWidth="1" />
-                    <rect x="52" y="2" width="68" height="8" rx="4" fill="var(--primary-accent)" />
-                    <circle cx="72" cy="6" r="2.5" fill="var(--btn-text-on-accent)" />
-                    <circle cx="100" cy="6" r="2.5" fill="var(--btn-text-on-accent)" />
-                  </g>
-                </svg>
+                {/* GameZone Brand Logo Emblem */}
+                <BrandLogo />
               </div>
             </motion.div>
           </div>
@@ -256,13 +197,38 @@ export const Home = ({ setCurrentView, openAuthModal, initialSection }) => {
           </p>
         </div>
 
+        {/* Guest Lock Banner */}
+        {currentUser?.isGuest && (
+          <div className="mb-8 p-4 sm:p-5 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--primary-accent-border)] flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-[var(--primary-accent-subtle)] border border-[var(--primary-accent-border)] text-[var(--primary-accent)] flex items-center justify-center shrink-0">
+                <Lock className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-[var(--text-primary)]">
+                  Account Required for Gameplay
+                </p>
+                <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+                  You must create an account or sign in to play any of the challenges below.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => openAuthModal('signup')}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold btn-primary shrink-0"
+            >
+              Sign Up to Play
+            </button>
+          </div>
+        )}
+
         {/* 4 Cards Grid (3 Core + Car Racing) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Card 1: Number Guessing */}
           <GameCard
             id="guess-game"
             title="Number Guessing"
-            tagline="Logic & Deduction"
+            tagline="Logic &amp; Deduction"
             description="Deduce the secret number chosen by the engine using strategic high/low feedback."
             illustrationType="number-guess"
             icon={Target}
@@ -279,7 +245,8 @@ export const Home = ({ setCurrentView, openAuthModal, initialSection }) => {
                 ? `${stats.highScores.numberGuessing} tries`
                 : '10 tries max',
             }}
-            ctaText="Start Guessing"
+            ctaText={currentUser?.isGuest ? 'Sign Up to Play' : 'Start Guessing'}
+            isLocked={currentUser?.isGuest}
             onPlay={handleLaunchGame}
           />
 
@@ -300,7 +267,8 @@ export const Home = ({ setCurrentView, openAuthModal, initialSection }) => {
               label: 'Wins / Draws',
               value: `${stats.ticTacToe?.aiWins || 0}W · ${stats.ticTacToe?.draws || 0}D`,
             }}
-            ctaText="Challenge Now"
+            ctaText={currentUser?.isGuest ? 'Sign Up to Play' : 'Challenge Now'}
+            isLocked={currentUser?.isGuest}
             onPlay={handleLaunchGame}
           />
 
@@ -325,7 +293,8 @@ export const Home = ({ setCurrentView, openAuthModal, initialSection }) => {
                 ? `${stats.highScores.puzzle3x3}s`
                 : 'Under 60s',
             }}
-            ctaText="Solve the Puzzle"
+            ctaText={currentUser?.isGuest ? 'Sign Up to Play' : 'Solve the Puzzle'}
+            isLocked={currentUser?.isGuest}
             onPlay={handleLaunchGame}
           />
 
@@ -350,7 +319,8 @@ export const Home = ({ setCurrentView, openAuthModal, initialSection }) => {
                 ? `${stats.highScores.carRacing}m`
                 : '1,200m target',
             }}
-            ctaText="Race Now"
+            ctaText={currentUser?.isGuest ? 'Sign Up to Play' : 'Race Now'}
+            isLocked={currentUser?.isGuest}
             onPlay={handleLaunchGame}
           />
         </div>

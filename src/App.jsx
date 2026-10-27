@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { AuthModal } from './components/AuthModal';
@@ -13,17 +13,21 @@ import { Achievements } from './pages/Achievements';
 import { About } from './pages/About';
 import { AuthPage } from './pages/AuthPage';
 import { Admin } from './pages/Admin';
-import { ToastProvider } from './context/ToastContext';
-import { AuthProvider } from './context/AuthContext';
+import { ToastProvider, useToast } from './context/ToastContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { GameStatsProvider } from './context/GameStatsContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { soundEffects } from './audio/soundEffects';
 
 function GameApp() {
-  const [currentView, setCurrentView] = useState('home'); // 'home' | 'games' | 'guess-game' | 'tic-tac-toe' | 'puzzle-game' | 'car-racing' | 'leaderboard' | 'achievements' | 'about' | 'auth' | 'admin'
-  const [authModalState, setAuthModalState] = useState({ isOpen: false, tab: 'signin' });
+  const [currentView, setCurrentView] = useState('home');
+  const [authModalState, setAuthModalState] = useState({ isOpen: false, tab: 'signup' });
   const [profileModalOpen, setProfileModalOpen] = useState(false);
 
-  const openAuthModal = (tab = 'signin') => {
+  const { currentUser } = useAuth();
+  const { addToast } = useToast();
+
+  const openAuthModal = (tab = 'signup') => {
     setAuthModalState({ isOpen: true, tab });
   };
 
@@ -39,10 +43,31 @@ function GameApp() {
     setProfileModalOpen(false);
   };
 
+  const GAME_VIEWS = ['guess-game', 'tic-tac-toe', 'puzzle-game', 'car-racing'];
+
+  // Intercept navigation: Require signup to play any game
   const handleNavigate = (viewId) => {
+    if (GAME_VIEWS.includes(viewId) && currentUser.isGuest) {
+      soundEffects.playHint(false);
+      addToast({
+        title: 'Sign Up Required 🔒',
+        message: 'Please create an account or sign in to play games!',
+        type: 'info',
+      });
+      openAuthModal('signup');
+      return;
+    }
     setCurrentView(viewId);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  // Guard: If guest somehow lands on a game route, redirect to home & prompt signup
+  useEffect(() => {
+    if (GAME_VIEWS.includes(currentView) && currentUser.isGuest) {
+      setCurrentView('home');
+      openAuthModal('signup');
+    }
+  }, [currentView, currentUser.isGuest]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg-page)] text-[var(--text-primary)] relative selection:bg-[var(--primary-accent)] selection:text-[var(--btn-text-on-accent)] transition-colors duration-250">
@@ -79,19 +104,19 @@ function GameApp() {
         )}
 
         {currentView === 'car-racing' && (
-          <CarRacing setCurrentView={handleNavigate} />
+          <CarRacing setCurrentView={handleNavigate} openAuthModal={openAuthModal} />
         )}
 
         {currentView === 'guess-game' && (
-          <NumberGuessing setCurrentView={handleNavigate} />
+          <NumberGuessing setCurrentView={handleNavigate} openAuthModal={openAuthModal} />
         )}
 
         {currentView === 'tic-tac-toe' && (
-          <TicTacToe setCurrentView={handleNavigate} />
+          <TicTacToe setCurrentView={handleNavigate} openAuthModal={openAuthModal} />
         )}
 
         {currentView === 'puzzle-game' && (
-          <Puzzle setCurrentView={handleNavigate} />
+          <Puzzle setCurrentView={handleNavigate} openAuthModal={openAuthModal} />
         )}
 
         {currentView === 'leaderboard' && (
@@ -118,7 +143,7 @@ function GameApp() {
       {/* Footer */}
       <Footer setCurrentView={handleNavigate} />
 
-      {/* Quick Auth Popup Modal */}
+      {/* Auth Modal (Sign In / Sign Up) */}
       <AuthModal
         isOpen={authModalState.isOpen}
         initialTab={authModalState.tab}

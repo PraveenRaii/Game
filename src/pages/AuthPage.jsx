@@ -17,8 +17,8 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { soundEffects } from '../audio/soundEffects';
 
-export const AuthPage = ({ setCurrentView, initialMode = 'signin' }) => {
-  const { login, signup, playAsGuest, AVATARS } = useAuth();
+export const AuthPage = ({ setCurrentView, initialMode = 'signup' }) => {
+  const { login, signup, AVATARS } = useAuth();
   const { addToast } = useToast();
 
   const [mode, setMode] = useState(initialMode); // 'signin' | 'signup'
@@ -109,16 +109,6 @@ export const AuthPage = ({ setCurrentView, initialMode = 'signin' }) => {
     }
   };
 
-  const handleGuest = () => {
-    playAsGuest();
-    addToast({
-      title: 'Playing as Guest Player',
-      message: 'All games are unlocked! Scores will be tracked locally.',
-      type: 'info',
-    });
-    setCurrentView('home');
-  };
-
   return (
     <div className="min-h-[85vh] py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center relative">
       <div className="w-full max-w-4xl relative z-10">
@@ -195,13 +185,12 @@ export const AuthPage = ({ setCurrentView, initialMode = 'signin' }) => {
             </div>
 
             <div className="mt-8 pt-6 border-t border-[var(--border-color)]">
-              <button
-                onClick={handleGuest}
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold btn-secondary flex items-center justify-center gap-2"
-              >
-                <span>Continue in Guest Mode</span>
-                <span>→</span>
-              </button>
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)] flex items-center gap-3">
+                <Lock className="w-4 h-4 text-[var(--primary-accent)] shrink-0" />
+                <p className="text-xs text-[var(--text-secondary)] font-sans">
+                  <strong className="text-[var(--text-primary)] font-semibold">Account Required:</strong> Sign up or sign in to play all games &amp; track high scores.
+                </p>
+              </div>
             </div>
           </div>
 

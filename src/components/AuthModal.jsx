@@ -5,8 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { soundEffects } from '../audio/soundEffects';
 
-export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
-  const { login, signup, playAsGuest, AVATARS } = useAuth();
+export const AuthModal = ({ isOpen, onClose, initialTab = 'signup' }) => {
+  const { login, signup, AVATARS } = useAuth();
   const { addToast } = useToast();
 
   const [activeTab, setActiveTab] = useState(initialTab); // 'signin' | 'signup'
@@ -95,16 +95,6 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
       setErrorMsg(res.message);
       soundEffects.playHint(false);
     }
-  };
-
-  const handleGuestContinue = () => {
-    playAsGuest();
-    addToast({
-      title: 'Playing as Guest Player',
-      message: 'You can enjoy all games! High scores will be saved locally.',
-      type: 'info',
-    });
-    onClose();
   };
 
   return (
@@ -353,15 +343,14 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
           </form>
         )}
 
-        {/* Guest Play Footer */}
+        {/* Mandatory Account Notice */}
         <div className="mt-5 pt-4 border-t border-[var(--border-color)] text-center">
-          <p className="text-xs text-[var(--text-secondary)] mb-2">Want to jump right into the action?</p>
-          <button
-            onClick={handleGuestContinue}
-            className="text-xs font-semibold text-[var(--primary-accent)] hover:underline underline-offset-4 transition-colors"
-          >
-            Continue as Guest Player →
-          </button>
+          <p className="text-xs text-[var(--text-secondary)] flex items-center justify-center gap-1.5 font-sans">
+            <Lock className="w-3.5 h-3.5 text-[var(--primary-accent)] shrink-0" />
+            <span>
+              <strong className="text-[var(--text-primary)] font-semibold">Account Required:</strong> Sign up or log in to play any game and save your records.
+            </span>
+          </p>
         </div>
       </motion.div>
     </div>

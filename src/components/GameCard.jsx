@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Play, ArrowRight, Trophy, Zap, Clock, Hash, Grid3X3, Car } from 'lucide-react';
+import { Play, ArrowRight, Trophy, Zap, Clock, Hash, Grid3X3, Car, Lock } from 'lucide-react';
 import { soundEffects } from '../audio/soundEffects';
 
 export const GameCard = ({
@@ -15,6 +15,7 @@ export const GameCard = ({
   ctaText = 'Play Now',
   illustrationType = 'generic',
   icon: Icon,
+  isLocked = false,
   onPlay,
 }) => {
   // Render distinctive visual illustration for each game
@@ -133,6 +134,16 @@ export const GameCard = ({
               </p>
             </div>
           </div>
+
+          {isLocked && (
+            <span
+              className="inline-flex items-center gap-1 text-[10px] font-bold text-[var(--primary-accent)] px-2.5 py-1 rounded-full bg-[var(--primary-accent-subtle)] border border-[var(--primary-accent-border)] shrink-0 tracking-wide"
+              title="Sign up required to play"
+            >
+              <Lock className="w-3 h-3" />
+              Sign Up
+            </span>
+          )}
         </div>
 
         {/* Description */}
@@ -191,7 +202,11 @@ export const GameCard = ({
         className="w-full py-3 px-5 rounded-2xl btn-primary flex items-center justify-center gap-2 group/btn focus:outline-none"
       >
         <span>{ctaText}</span>
-        <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+        {isLocked ? (
+          <Lock className="w-4 h-4 transition-transform group-hover/btn:scale-110" />
+        ) : (
+          <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+        )}
       </button>
     </motion.div>
   );

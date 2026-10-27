@@ -13,9 +13,11 @@ import {
   Activity,
   Heart,
   Sparkles,
+  Lock,
 } from 'lucide-react';
 import { soundEffects } from '../audio/soundEffects';
 import { useGameStats } from '../context/GameStatsContext';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { triggerConfetti } from '../components/Confetti';
 
@@ -40,8 +42,9 @@ const DIFFICULTY_CONFIG = {
   },
 };
 
-export const NumberGuessing = ({ setCurrentView }) => {
+export const NumberGuessing = ({ setCurrentView, openAuthModal }) => {
   const { stats, recordNumberGuessResult } = useGameStats();
+  const { currentUser } = useAuth();
   const { addToast } = useToast();
 
   const [difficulty, setDifficulty] = useState('medium');
@@ -55,6 +58,46 @@ export const NumberGuessing = ({ setCurrentView }) => {
   const [errorInput, setErrorInput] = useState('');
 
   const inputRef = useRef(null);
+
+  if (currentUser?.isGuest) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center p-4">
+        <div className="max-w-md w-full surface-card rounded-3xl p-8 border border-[var(--border-color)] text-center space-y-5 shadow-2xl">
+          <div className="w-14 h-14 rounded-2xl bg-[var(--primary-accent-subtle)] border border-[var(--primary-accent-border)] text-[var(--primary-accent)] flex items-center justify-center mx-auto">
+            <Lock className="w-7 h-7" />
+          </div>
+          <div>
+            <h2 className="font-heading font-extrabold text-2xl text-[var(--text-primary)]">
+              Sign Up Required
+            </h2>
+            <p className="text-sm text-[var(--text-secondary)] mt-2 font-sans leading-relaxed">
+              You must create an account or sign in to play Number Guessing, track attempts, and compete on the leaderboard.
+            </p>
+          </div>
+          <div className="pt-2 flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={() => openAuthModal && openAuthModal('signup')}
+              className="flex-1 py-3 rounded-2xl btn-primary font-bold text-sm"
+            >
+              Sign Up Free
+            </button>
+            <button
+              onClick={() => openAuthModal && openAuthModal('signin')}
+              className="flex-1 py-3 rounded-2xl btn-secondary font-bold text-sm"
+            >
+              Sign In
+            </button>
+          </div>
+          <button
+            onClick={() => setCurrentView('home')}
+            className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors underline underline-offset-4"
+          >
+            ← Back to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Initialize new secret number
   const initGame = (diff = difficulty) => {
