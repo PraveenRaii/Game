@@ -3,9 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
   RotateCcw,
-  Sparkles,
   Trophy,
-  Flame,
   ArrowUp,
   ArrowDown,
   CheckCircle2,
@@ -14,6 +12,7 @@ import {
   Hash,
   Activity,
   Heart,
+  Sparkles,
 } from 'lucide-react';
 import { soundEffects } from '../audio/soundEffects';
 import { useGameStats } from '../context/GameStatsContext';
@@ -26,24 +25,18 @@ const DIFFICULTY_CONFIG = {
     min: 1,
     max: 50,
     maxAttempts: 10,
-    color: 'from-emerald-400 to-teal-500',
-    badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
   },
   medium: {
     label: 'Medium',
     min: 1,
     max: 100,
     maxAttempts: 7,
-    color: 'from-cyan-400 to-blue-500',
-    badge: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
   },
   hard: {
     label: 'Hard',
     min: 1,
     max: 500,
     maxAttempts: 8,
-    color: 'from-purple-500 to-pink-500',
-    badge: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
   },
 };
 
@@ -57,7 +50,7 @@ export const NumberGuessing = ({ setCurrentView }) => {
   const [targetNumber, setTargetNumber] = useState(1);
   const [userGuess, setUserGuess] = useState('');
   const [guessHistory, setGuessHistory] = useState([]);
-  const [feedback, setFeedback] = useState(null); // { type: 'high' | 'low' | 'correct' | 'close', text: string }
+  const [feedback, setFeedback] = useState(null);
   const [gameState, setGameState] = useState('playing'); // 'playing' | 'won' | 'lost'
   const [errorInput, setErrorInput] = useState('');
 
@@ -71,7 +64,7 @@ export const NumberGuessing = ({ setCurrentView }) => {
     setGuessHistory([]);
     setFeedback({
       type: 'info',
-      text: `Game ready! Guess a number between ${curConfig.min} and ${curConfig.max}.`,
+      text: `Engine ready! Guess a number between ${curConfig.min} and ${curConfig.max}.`,
     });
     setGameState('playing');
     setUserGuess('');
@@ -88,7 +81,7 @@ export const NumberGuessing = ({ setCurrentView }) => {
   const progressPercent = Math.max(0, (attemptsRemaining / config.maxAttempts) * 100);
 
   const bestScoreKey = difficulty === 'easy' ? 'bestEasy' : difficulty === 'hard' ? 'bestHard' : 'bestMedium';
-  const bestScore = stats.numberGuessing[bestScoreKey];
+  const bestScore = stats.numberGuessing?.[bestScoreKey];
 
   // Handle Guess submission
   const handleGuessSubmit = (e) => {
@@ -126,7 +119,7 @@ export const NumberGuessing = ({ setCurrentView }) => {
 
     if (parsed === targetNumber) {
       hintType = 'correct';
-      hintText = `Correct Guess! 🎉 The secret number was indeed ${targetNumber}!`;
+      hintText = `Spot on! The secret number is indeed ${targetNumber}.`;
       setGameState('won');
       soundEffects.playWin();
       triggerConfetti();
@@ -139,14 +132,14 @@ export const NumberGuessing = ({ setCurrentView }) => {
     } else if (parsed > targetNumber) {
       hintType = 'high';
       hintText = isClose
-        ? `🔥 Super Close but Too High! (Try a slightly lower number)`
-        : `🔻 Too High! Try a lower number.`;
+        ? `Very Close, but Too High! (Try a slightly lower number)`
+        : `Too High! Try a lower number.`;
       soundEffects.playHint(true);
     } else {
       hintType = 'low';
       hintText = isClose
-        ? `🔥 Super Close but Too Low! (Try a slightly higher number)`
-        : `🔺 Too Low! Try a higher number.`;
+        ? `Very Close, but Too Low! (Try a slightly higher number)`
+        : `Too Low! Try a higher number.`;
       soundEffects.playHint(false);
     }
 
@@ -168,30 +161,30 @@ export const NumberGuessing = ({ setCurrentView }) => {
       soundEffects.playGameOver();
       recordNumberGuessResult({ won: false, attempts: newAttemptsUsed, difficulty });
       addToast({
-        title: 'Out of Attempts! 💀',
-        message: `The secret number was ${targetNumber}. Give it another try!`,
+        title: 'Out of Attempts',
+        message: `The secret number was ${targetNumber}. Play again!`,
         type: 'error',
       });
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-      {/* Top Navigation & Header */}
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+      {/* Top Header & Difficulty Selector */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <button
           onClick={() => {
             soundEffects.playClick();
             setCurrentView('home');
           }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-slate-300 hover:text-white glass-panel border border-white/10 hover:border-cyan-500/40 transition-all self-start"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] surface-card hover:border-[var(--primary-accent-border)] transition-all self-start"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Games
         </button>
 
         {/* Difficulty Switcher */}
-        <div className="flex items-center p-1 rounded-2xl bg-white/5 border border-white/10 self-start sm:self-auto">
+        <div className="flex items-center p-1 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)] self-start sm:self-auto">
           {Object.entries(DIFFICULTY_CONFIG).map(([key, item]) => {
             const isSelected = difficulty === key;
             return (
@@ -201,10 +194,10 @@ export const NumberGuessing = ({ setCurrentView }) => {
                   soundEffects.playClick();
                   setDifficulty(key);
                 }}
-                className={`px-3 sm:px-4 py-1.5 text-xs font-bold rounded-xl transition-all ${
+                className={`px-3 sm:px-4 py-1.5 text-xs font-semibold rounded-xl transition-all ${
                   isSelected
-                    ? 'bg-gradient-to-r from-cyan-400 to-blue-600 text-black shadow-md'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-[var(--primary-accent)] text-[var(--btn-text-on-accent)] font-bold'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 {item.label} ({item.min}-{item.max})
@@ -214,239 +207,216 @@ export const NumberGuessing = ({ setCurrentView }) => {
         </div>
       </div>
 
-      {/* Main Game Arena */}
+      {/* Main Game Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Play Column */}
         <div className="lg:col-span-7 space-y-6">
-          <div className="glass-panel-cyan rounded-3xl p-6 sm:p-8 border border-cyan-500/30 relative overflow-hidden shadow-2xl">
+          <div className="surface-card rounded-3xl p-6 sm:p-8 relative overflow-hidden">
             {/* Top Stat Pills */}
             <div className="flex items-center justify-between gap-2 mb-6">
-              <span className={`text-xs font-bold px-3 py-1 rounded-full border uppercase tracking-wider ${config.badge}`}>
-                {config.label} Range: {config.min}–{config.max}
+              <span className="text-xs font-semibold px-3 py-1 rounded-full badge-lime uppercase tracking-wider">
+                Range: {config.min}–{config.max}
               </span>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-slate-400 flex items-center gap-1.5 bg-white/5 px-3 py-1 rounded-full border border-white/10">
-                  <Trophy className="w-3.5 h-3.5 text-yellow-400" />
-                  Best: <strong className="text-white">{bestScore ? `${bestScore} tries` : 'None'}</strong>
+                <span className="text-xs font-medium text-[var(--text-secondary)] flex items-center gap-1.5 bg-[var(--bg-elevated)] px-3 py-1 rounded-full border border-[var(--border-color)]">
+                  <Trophy className="w-3.5 h-3.5 text-[var(--primary-accent)]" />
+                  Best:{' '}
+                  <strong className="font-mono-stats text-[var(--text-primary)]">
+                    {bestScore ? `${bestScore} tries` : '—'}
+                  </strong>
                 </span>
               </div>
             </div>
 
             {/* Target Display or Mystery Box */}
             <div className="text-center my-6">
-              <div className="relative inline-flex items-center justify-center w-28 h-28 rounded-3xl bg-gradient-to-tr from-cyan-500/20 via-purple-500/20 to-blue-500/20 border-2 border-cyan-400/50 shadow-2xl shadow-cyan-500/20 mb-3">
+              <div className="relative inline-flex items-center justify-center w-28 h-28 rounded-3xl bg-[var(--bg-elevated)] border-2 border-[var(--primary-accent-border)] mb-4 shadow-sm">
                 <motion.span
                   key={gameState === 'playing' ? 'hidden' : targetNumber}
-                  initial={{ scale: 0.5, rotate: -20, opacity: 0 }}
+                  initial={{ scale: 0.5, rotate: -15, opacity: 0 }}
                   animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                  transition={{ type: 'spring', damping: 12 }}
-                  className="font-['Orbitron'] text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-white to-purple-300"
+                  transition={{ type: 'spring', damping: 14 }}
+                  className="font-mono-stats text-5xl font-extrabold text-[var(--primary-accent)]"
                 >
                   {gameState === 'playing' ? '?' : targetNumber}
                 </motion.span>
-                <div className="absolute -inset-1 rounded-3xl bg-cyan-400/20 blur-md pointer-events-none" />
               </div>
 
-              <h2 className="font-['Orbitron'] text-2xl font-bold text-white tracking-wide">
-                {gameState === 'playing'
-                  ? 'Guess the Secret Number'
-                  : gameState === 'won'
-                  ? 'Mission Accomplished!'
-                  : 'Better Luck Next Time!'}
-              </h2>
-              <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-                {gameState === 'playing'
-                  ? `Enter a number between ${config.min} and ${config.max}. Observe the hints carefully!`
-                  : gameState === 'won'
-                  ? `Spectacular deduction! You solved it in ${attemptsUsed} ${attemptsUsed === 1 ? 'attempt' : 'attempts'}.`
-                  : `You ran out of attempts. The secret number was ${targetNumber}.`}
-              </p>
-            </div>
-
-            {/* Progress Gauge: Remaining Attempts */}
-            <div className="space-y-2 mb-6">
-              <div className="flex items-center justify-between text-xs font-semibold">
-                <span className="text-slate-400 flex items-center gap-1.5">
-                  <Activity className="w-3.5 h-3.5 text-cyan-400" />
-                  Remaining Attempts
-                </span>
-                <span className={attemptsRemaining <= 2 ? 'text-rose-400 font-bold' : 'text-cyan-300'}>
-                  {attemptsRemaining} / {config.maxAttempts}
-                </span>
-              </div>
-
-              <div className="h-3 w-full bg-slate-800/80 rounded-full overflow-hidden p-0.5 border border-white/10">
-                <motion.div
-                  initial={false}
-                  animate={{ width: `${progressPercent}%` }}
-                  transition={{ duration: 0.3 }}
-                  className={`h-full rounded-full transition-all ${
-                    attemptsRemaining <= 2
-                      ? 'bg-gradient-to-r from-rose-500 to-red-600'
-                      : attemptsRemaining <= 4
-                      ? 'bg-gradient-to-r from-amber-400 to-orange-500'
-                      : 'bg-gradient-to-r from-cyan-400 to-blue-500'
-                  }`}
-                />
-              </div>
-
-              {/* Heart indicators */}
-              <div className="flex items-center justify-center gap-1.5 pt-1">
-                {Array.from({ length: config.maxAttempts }).map((_, i) => (
-                  <Heart
-                    key={i}
-                    className={`w-3.5 h-3.5 transition-all ${
-                      i < attemptsRemaining
-                        ? 'text-rose-500 fill-rose-500 scale-100'
-                        : 'text-slate-700 fill-slate-800 scale-90 opacity-40'
-                    }`}
-                  />
-                ))}
+              <div className="space-y-1.5 mb-6">
+                <h2 className="font-heading text-2xl font-bold text-[var(--text-primary)] tracking-tight">
+                  {gameState === 'playing'
+                    ? 'Guess the Secret Number'
+                    : gameState === 'won'
+                    ? 'Mission Accomplished!'
+                    : 'Target Not Found!'}
+                </h2>
+                <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-sm mx-auto font-sans leading-relaxed">
+                  {gameState === 'playing'
+                    ? `Enter a number between ${config.min} and ${config.max}. Observe the high/low feedback.`
+                    : gameState === 'won'
+                    ? `You identified the secret number in ${attemptsUsed} tries!`
+                    : `The hidden number was ${targetNumber}. Try again with binary search!`}
+                </p>
               </div>
             </div>
 
-            {/* Hint / Feedback Box */}
-            {feedback && (
-              <motion.div
-                key={feedback.text}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={`p-3.5 rounded-2xl mb-6 text-xs sm:text-sm font-semibold flex items-center gap-3 border ${
-                  feedback.type === 'correct'
-                    ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
-                    : feedback.type === 'high'
-                    ? 'bg-amber-500/15 border-amber-500/30 text-amber-300'
-                    : feedback.type === 'low'
-                    ? 'bg-sky-500/15 border-sky-500/30 text-sky-300'
-                    : 'bg-white/5 border-white/10 text-slate-300'
-                }`}
-              >
-                <div className="shrink-0">
-                  {feedback.type === 'correct' && <CheckCircle2 className="w-5 h-5 text-emerald-400" />}
-                  {feedback.type === 'high' && <ArrowDown className="w-5 h-5 text-amber-400" />}
-                  {feedback.type === 'low' && <ArrowUp className="w-5 h-5 text-sky-400" />}
-                  {feedback.type === 'info' && <HelpCircle className="w-5 h-5 text-cyan-400" />}
-                </div>
-                <span>{feedback.text}</span>
-              </motion.div>
-            )}
-
-            {/* Input Form or Restart Action */}
+            {/* Guess Input Form */}
             {gameState === 'playing' ? (
-              <form onSubmit={handleGuessSubmit} className="space-y-3">
+              <form onSubmit={handleGuessSubmit} className="space-y-4">
                 <div className="flex gap-2.5">
                   <div className="relative flex-1">
-                    <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-mono-stats text-xs text-[var(--text-secondary)]">
+                      #
+                    </span>
                     <input
                       ref={inputRef}
                       type="number"
-                      placeholder={`Enter guess (${config.min}-${config.max})`}
+                      min={config.min}
+                      max={config.max}
                       value={userGuess}
                       onChange={(e) => {
                         setUserGuess(e.target.value);
                         setErrorInput('');
                       }}
-                      min={config.min}
-                      max={config.max}
-                      className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-white font-['Orbitron'] text-lg placeholder:text-sm placeholder:font-sans placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all"
+                      placeholder={`Enter guess (${config.min}-${config.max})`}
+                      className="w-full pl-9 pr-4 py-3.5 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] font-mono-stats text-base placeholder:text-[var(--text-secondary)] placeholder:font-sans focus:outline-none focus:border-[var(--primary-accent)] focus:ring-1 focus:ring-[var(--primary-accent)] transition-all"
+                      autoFocus
                     />
                   </div>
-
                   <button
                     type="submit"
-                    className="px-6 sm:px-8 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 text-black font-['Orbitron'] font-bold text-sm shadow-lg shadow-cyan-500/25 hover:shadow-cyan-400/40 hover:scale-[1.02] active:scale-95 transition-all"
+                    className="px-6 py-3.5 rounded-2xl btn-primary font-bold text-sm tracking-wide focus:outline-none"
                   >
                     Guess
                   </button>
                 </div>
 
                 {errorInput && (
-                  <p className="text-xs text-rose-400 flex items-center gap-1.5 pl-2 font-medium">
-                    <AlertTriangle className="w-3.5 h-3.5" />
+                  <motion.p
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-xs text-red-400 font-medium flex items-center gap-1.5"
+                  >
+                    <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                     {errorInput}
-                  </p>
+                  </motion.p>
                 )}
               </form>
             ) : (
-              <div className="flex gap-3">
+              <div className="pt-2">
                 <button
-                  onClick={() => {
-                    soundEffects.playClick();
-                    initGame();
-                  }}
-                  className="flex-1 py-4 rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-400 to-purple-500 text-black font-['Orbitron'] font-bold text-sm shadow-lg shadow-cyan-500/25 hover:shadow-cyan-400/40 hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-2"
+                  onClick={() => initGame(difficulty)}
+                  className="w-full py-3.5 rounded-2xl btn-primary font-bold text-sm flex items-center justify-center gap-2 focus:outline-none"
                 >
                   <RotateCcw className="w-4 h-4" />
-                  Play Again
+                  <span>Play Again</span>
                 </button>
               </div>
             )}
+
+            {/* Active Feedback Banner */}
+            {feedback && (
+              <motion.div
+                key={feedback.text}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`mt-6 p-4 rounded-2xl border flex items-center gap-3 ${
+                  feedback.type === 'correct'
+                    ? 'bg-[var(--primary-accent-subtle)] border-[var(--primary-accent-border)] text-[var(--primary-accent)]'
+                    : feedback.type === 'high'
+                    ? 'bg-[var(--bg-elevated)] border-[var(--border-color)] text-[var(--text-primary)]'
+                    : feedback.type === 'low'
+                    ? 'bg-[var(--bg-elevated)] border-[var(--border-color)] text-[var(--text-primary)]'
+                    : 'bg-[var(--bg-elevated)] border-[var(--border-color)] text-[var(--text-secondary)]'
+                }`}
+              >
+                {feedback.type === 'correct' ? (
+                  <CheckCircle2 className="w-5 h-5 shrink-0 text-[var(--primary-accent)]" />
+                ) : feedback.type === 'high' ? (
+                  <ArrowDown className="w-5 h-5 shrink-0 text-[var(--primary-accent)]" />
+                ) : feedback.type === 'low' ? (
+                  <ArrowUp className="w-5 h-5 shrink-0 text-[var(--primary-accent)]" />
+                ) : (
+                  <HelpCircle className="w-5 h-5 shrink-0 text-[var(--text-secondary)]" />
+                )}
+                <span className="text-xs sm:text-sm font-medium">{feedback.text}</span>
+              </motion.div>
+            )}
+
+            {/* Attempts Gauge & Remaining Counter */}
+            <div className="mt-6 pt-5 border-t border-[var(--border-color)] space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-[var(--text-secondary)] font-medium">
+                  Attempts Used: <strong className="font-mono-stats text-[var(--text-primary)]">{attemptsUsed} / {config.maxAttempts}</strong>
+                </span>
+                <span className="text-[var(--text-secondary)] font-medium">
+                  Remaining: <strong className="font-mono-stats text-[var(--primary-accent)]">{attemptsRemaining}</strong>
+                </span>
+              </div>
+              <div className="w-full h-2 rounded-full bg-[var(--bg-elevated)] border border-[var(--border-color)] overflow-hidden">
+                <div
+                  className="h-full bg-[var(--primary-accent)] transition-all duration-300"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* History & Stats Column */}
+        {/* Guess History Column */}
         <div className="lg:col-span-5 space-y-6">
-          {/* Quick Stats Card */}
-          <div className="glass-panel rounded-3xl p-6 border border-white/10 shadow-xl">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-['Orbitron'] font-bold text-sm text-white uppercase tracking-wider flex items-center gap-2">
-                <Activity className="w-4 h-4 text-cyan-400" />
-                Guess History
+          <div className="surface-card rounded-3xl p-6 sm:p-7 border border-[var(--border-color)] h-full flex flex-col">
+            <div className="flex items-center justify-between pb-4 border-b border-[var(--border-color)] mb-4">
+              <h3 className="font-heading font-bold text-lg text-[var(--text-primary)] flex items-center gap-2">
+                <Activity className="w-4 h-4 text-[var(--primary-accent)]" />
+                Attempts History
               </h3>
-              <button
-                onClick={() => {
-                  soundEffects.playClick();
-                  initGame();
-                }}
-                className="text-xs font-semibold text-slate-400 hover:text-cyan-300 flex items-center gap-1 transition-colors"
-                title="Restart Game"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                Restart
-              </button>
+              <span className="font-mono-stats text-xs font-semibold text-[var(--text-secondary)]">
+                {guessHistory.length} Recorded
+              </span>
             </div>
 
             {guessHistory.length === 0 ? (
-              <div className="text-center py-10 px-4 rounded-2xl bg-white/5 border border-dashed border-white/10">
-                <Sparkles className="w-8 h-8 text-slate-500 mx-auto mb-2" />
-                <p className="text-xs text-slate-400 font-medium">No guesses entered yet.</p>
-                <p className="text-[11px] text-slate-500 mt-1">
-                  Type a number and click Guess to start tracking clues!
-                </p>
+              <div className="flex-1 flex flex-col items-center justify-center text-center py-12 text-[var(--text-secondary)]">
+                <Hash className="w-8 h-8 opacity-40 mb-2" />
+                <p className="text-xs font-medium">No attempts recorded yet.</p>
+                <p className="text-[11px] opacity-60">Enter a number to start deducing.</p>
               </div>
             ) : (
-              <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
-                {guessHistory.map((item, idx) => (
+              <div className="space-y-2.5 max-h-[460px] overflow-y-auto pr-1">
+                {guessHistory.map((item, index) => (
                   <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, x: -10 }}
+                    key={item.attempt}
+                    initial={{ opacity: 0, x: 10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 text-xs"
+                    className={`p-3 rounded-xl border text-xs flex items-center justify-between ${
+                      item.type === 'correct'
+                        ? 'bg-[var(--primary-accent-subtle)] border-[var(--primary-accent-border)] text-[var(--primary-accent)]'
+                        : 'bg-[var(--bg-elevated)] border-[var(--border-color)] text-[var(--text-primary)]'
+                    }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="w-6 h-6 rounded-lg bg-white/5 text-slate-400 flex items-center justify-center font-bold text-[10px]">
+                      <span className="font-mono-stats text-[10px] text-[var(--text-secondary)]">
                         #{item.attempt}
                       </span>
-                      <span className="font-['Orbitron'] font-bold text-white text-base">
+                      <span className="font-mono-stats text-base font-bold">
                         {item.number}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 font-medium text-[11px]">
                       {item.type === 'correct' && (
-                        <span className="px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30 flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3" /> Correct!
-                        </span>
+                        <span className="text-[var(--primary-accent)] font-bold">Correct!</span>
                       )}
                       {item.type === 'high' && (
-                        <span className="px-2.5 py-1 rounded-md bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30 flex items-center gap-1">
-                          <ArrowDown className="w-3 h-3" /> Too High
+                        <span className="text-[var(--text-secondary)] flex items-center gap-1">
+                          <ArrowDown className="w-3.5 h-3.5 text-[var(--primary-accent)]" /> Too High
                         </span>
                       )}
                       {item.type === 'low' && (
-                        <span className="px-2.5 py-1 rounded-md bg-sky-500/20 text-sky-300 font-bold border border-sky-500/30 flex items-center gap-1">
-                          <ArrowUp className="w-3 h-3" /> Too Low
+                        <span className="text-[var(--text-secondary)] flex items-center gap-1">
+                          <ArrowUp className="w-3.5 h-3.5 text-[var(--primary-accent)]" /> Too Low
                         </span>
                       )}
                     </div>
@@ -454,17 +424,6 @@ export const NumberGuessing = ({ setCurrentView }) => {
                 ))}
               </div>
             )}
-          </div>
-
-          {/* Strategy Tip Box */}
-          <div className="glass-panel rounded-3xl p-6 border border-white/10">
-            <h4 className="font-['Orbitron'] text-xs font-bold text-cyan-300 uppercase tracking-widest mb-2 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-cyan-400" />
-              Pro Gamer Tip: Binary Search
-            </h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Always guess the exact middle of the remaining range! For instance, in 1–100, begin at <strong>50</strong>. If it’s Too High, guess <strong>25</strong>; if Too Low, guess <strong>75</strong>. This guarantees finding any number within 7 guesses!
-            </p>
           </div>
         </div>
       </div>

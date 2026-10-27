@@ -8,10 +8,9 @@ import {
   Bot,
   User,
   Users,
-  Sparkles,
-  Zap,
   Shield,
   HelpCircle,
+  Sparkles,
 } from 'lucide-react';
 import { checkWinner, getBestMove, getEasyMove, WINNING_COMBOS } from '../utils/minimax';
 import { soundEffects } from '../audio/soundEffects';
@@ -58,7 +57,7 @@ export const TicTacToe = ({ setCurrentView }) => {
     setScores({ player1: 0, player2OrAI: 0, draws: 0 });
     addToast({
       title: 'Match Reset',
-      message: 'Scoreboard reset to 0 - 0. Good luck!',
+      message: 'Scoreboard reset to 0 - 0.',
       type: 'info',
     });
   };
@@ -86,7 +85,7 @@ export const TicTacToe = ({ setCurrentView }) => {
           executeMove(moveIndex, aiSymbol);
         }
         setIsAiThinking(false);
-      }, 450); // slight delay for natural feel
+      }, 450);
 
       return () => clearTimeout(timer);
     }
@@ -138,8 +137,8 @@ export const TicTacToe = ({ setCurrentView }) => {
             title: `Player ${result.winner} Wins! 🏆`,
             message:
               gameMode === 'ai'
-                ? `You vanquished the ${aiDifficulty.toUpperCase()} AI!`
-                : `Superb match! Player ${result.winner} took the crown.`,
+                ? `You outplayed Minimax AI on ${aiDifficulty} mode!`
+                : `Player ${result.winner} secured victory.`,
             type: 'success',
           });
         } else {
@@ -152,61 +151,56 @@ export const TicTacToe = ({ setCurrentView }) => {
             winnerSymbol: result.winner,
           });
           addToast({
-            title: 'AI Won! 🤖',
-            message: 'The AI executed a flawless sequence. Rematch?',
+            title: 'AI Claimed Victory',
+            message: 'Minimax AI found the optimal sequence. Try again!',
             type: 'error',
           });
         }
       }
     } else {
       // Toggle turn
-      setCurrentTurn(symbol === 'X' ? 'O' : 'X');
+      setCurrentTurn((prev) => (prev === 'X' ? 'O' : 'X'));
     }
   };
 
-  // Human click cell
   const handleCellClick = (index) => {
-    if (board[index] !== null || gameResult || isAiThinking) return;
-
-    // In AI mode, ignore clicks when it's AI's turn
+    if (isAiThinking || gameResult) return;
     if (gameMode === 'ai' && currentTurn !== playerSymbol) return;
-
     executeMove(index, currentTurn);
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-      {/* Top Header */}
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+      {/* Top Header & Navigation */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <button
           onClick={() => {
             soundEffects.playClick();
             setCurrentView('home');
           }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-slate-300 hover:text-white glass-panel border border-white/10 hover:border-purple-500/40 transition-all self-start"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] surface-card hover:border-[var(--primary-accent-border)] transition-all self-start"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Games
         </button>
 
-        {/* Mode & AI Switcher */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Mode */}
-          <div className="flex items-center p-1 rounded-2xl bg-white/5 border border-white/10">
+        {/* Mode Selector */}
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          <div className="flex items-center p-1 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)]">
             <button
               onClick={() => {
                 soundEffects.playClick();
                 setGameMode('ai');
                 resetBoard();
               }}
-              className={`px-3 py-1.5 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-xl transition-all ${
                 gameMode === 'ai'
-                  ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[var(--primary-accent)] text-[var(--btn-text-on-accent)] font-bold'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <Bot className="w-3.5 h-3.5" />
-              Vs AI
+              <span>vs AI</span>
             </button>
             <button
               onClick={() => {
@@ -214,33 +208,32 @@ export const TicTacToe = ({ setCurrentView }) => {
                 setGameMode('pvp');
                 resetBoard();
               }}
-              className={`px-3 py-1.5 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-xl transition-all ${
                 gameMode === 'pvp'
-                  ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[var(--primary-accent)] text-[var(--btn-text-on-accent)] font-bold'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <Users className="w-3.5 h-3.5" />
-              2 Players
+              <span>2 Players</span>
             </button>
           </div>
 
-          {/* AI Difficulty (only in AI mode) */}
           {gameMode === 'ai' && (
-            <div className="flex items-center p-1 rounded-2xl bg-white/5 border border-white/10">
+            <div className="flex items-center p-1 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)]">
               <button
                 onClick={() => {
                   soundEffects.playClick();
                   setAiDifficulty('easy');
                   resetBoard();
                 }}
-                className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all ${
+                className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-all ${
                   aiDifficulty === 'easy'
-                    ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-500/40'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-[var(--primary-accent-subtle)] text-[var(--primary-accent)] border border-[var(--primary-accent-border)] font-bold'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
-                Easy AI
+                Easy
               </button>
               <button
                 onClick={() => {
@@ -248,10 +241,10 @@ export const TicTacToe = ({ setCurrentView }) => {
                   setAiDifficulty('hard');
                   resetBoard();
                 }}
-                className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all ${
+                className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-all ${
                   aiDifficulty === 'hard'
-                    ? 'bg-rose-500/25 text-rose-300 border border-rose-500/40'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-[var(--primary-accent)] text-[var(--btn-text-on-accent)] font-bold'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 Minimax (Hard)
@@ -264,23 +257,17 @@ export const TicTacToe = ({ setCurrentView }) => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Game Board Column */}
         <div className="lg:col-span-7 flex flex-col items-center">
-          <div className="w-full glass-panel-glow rounded-3xl p-6 sm:p-8 border border-purple-500/30 shadow-2xl relative">
+          <div className="w-full surface-card rounded-3xl p-6 sm:p-8 relative">
             {/* Status & Turn Banner */}
             <div className="flex items-center justify-between gap-3 mb-6">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                <span className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
                   Turn:
                 </span>
-                <div
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border transition-all ${
-                    currentTurn === 'X'
-                      ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
-                      : 'bg-purple-500/20 text-purple-300 border-purple-500/40'
-                  }`}
-                >
-                  <span className="font-['Orbitron']">{currentTurn}</span>
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold badge-lime">
+                  <span className="font-mono-stats">{currentTurn}</span>
                   {gameMode === 'ai' && (
-                    <span className="text-[10px] opacity-75">
+                    <span className="text-[10px] opacity-80">
                       ({currentTurn === playerSymbol ? 'You' : 'AI'})
                     </span>
                   )}
@@ -289,17 +276,17 @@ export const TicTacToe = ({ setCurrentView }) => {
 
               {/* Symbol selector when board is untouched */}
               {board.every((c) => c === null) && gameMode === 'ai' && (
-                <div className="flex items-center gap-1 text-xs">
-                  <span className="text-slate-400 text-[11px] mr-1">You play:</span>
+                <div className="flex items-center gap-1.5 text-xs">
+                  <span className="text-[var(--text-secondary)] text-[11px]">Symbol:</span>
                   <button
                     onClick={() => {
                       soundEffects.playClick();
                       setPlayerSymbol('X');
                     }}
-                    className={`px-2 py-0.5 rounded-md font-bold transition-all ${
+                    className={`px-2.5 py-0.5 rounded-lg font-mono-stats font-bold transition-all ${
                       playerSymbol === 'X'
-                        ? 'bg-cyan-500 text-black shadow-sm'
-                        : 'bg-white/5 text-slate-400 hover:text-white'
+                        ? 'bg-[var(--primary-accent)] text-[var(--btn-text-on-accent)]'
+                        : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)]'
                     }`}
                   >
                     X
@@ -309,10 +296,10 @@ export const TicTacToe = ({ setCurrentView }) => {
                       soundEffects.playClick();
                       setPlayerSymbol('O');
                     }}
-                    className={`px-2 py-0.5 rounded-md font-bold transition-all ${
+                    className={`px-2.5 py-0.5 rounded-lg font-mono-stats font-bold transition-all ${
                       playerSymbol === 'O'
-                        ? 'bg-purple-500 text-white shadow-sm'
-                        : 'bg-white/5 text-slate-400 hover:text-white'
+                        ? 'bg-[var(--primary-accent)] text-[var(--btn-text-on-accent)]'
+                        : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)]'
                     }`}
                   >
                     O
@@ -321,8 +308,8 @@ export const TicTacToe = ({ setCurrentView }) => {
               )}
             </div>
 
-            {/* 3x3 Grid Board */}
-            <div className="relative aspect-square max-w-[340px] sm:max-w-[380px] mx-auto grid grid-cols-3 gap-3 p-3 rounded-2xl bg-black/40 border border-white/10 shadow-inner">
+            {/* 3x3 Monochrome Board with Lime-Green Highlights */}
+            <div className="relative aspect-square max-w-[340px] sm:max-w-[380px] mx-auto grid grid-cols-3 gap-3 p-3.5 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)]">
               {board.map((cell, idx) => {
                 const isWinningCell = gameResult?.line?.includes(idx);
                 return (
@@ -330,30 +317,28 @@ export const TicTacToe = ({ setCurrentView }) => {
                     key={idx}
                     onClick={() => handleCellClick(idx)}
                     disabled={cell !== null || isAiThinking || !!gameResult}
-                    className={`relative rounded-2xl flex items-center justify-center font-['Orbitron'] text-4xl sm:text-5xl font-extrabold transition-all duration-200 select-none ${
+                    className={`relative rounded-2xl flex items-center justify-center font-heading text-4xl sm:text-5xl font-extrabold transition-all duration-200 select-none ${
                       cell === null
-                        ? 'bg-white/5 hover:bg-white/10 border border-white/10 active:scale-95 cursor-pointer'
-                        : 'bg-white/[0.07] border border-white/15 cursor-default'
+                        ? 'bg-[var(--bg-card)] hover:bg-[var(--bg-card)]/80 border border-[var(--border-color)] hover:border-[var(--primary-accent-border)] active:scale-95 cursor-pointer'
+                        : 'bg-[var(--bg-card)] border border-[var(--border-color)] cursor-default'
                     } ${
                       isWinningCell
-                        ? cell === 'X'
-                          ? 'bg-cyan-500/30 border-2 border-cyan-400 shadow-lg shadow-cyan-500/40 scale-105'
-                          : 'bg-purple-500/30 border-2 border-purple-400 shadow-lg shadow-purple-500/40 scale-105'
+                        ? 'bg-[var(--primary-accent-subtle)] border-2 border-[var(--primary-accent)] scale-105 shadow-md shadow-[var(--primary-accent)]/20'
                         : ''
                     }`}
-                    aria-label={`Cell ${idx + 1}, ${cell || 'empty'}`}
+                    aria-label={`Grid cell ${idx + 1}, ${cell || 'empty'}`}
                   >
                     <AnimatePresence>
                       {cell && (
                         <motion.span
-                          initial={{ scale: 0, rotate: -45, opacity: 0 }}
+                          initial={{ scale: 0, rotate: -30, opacity: 0 }}
                           animate={{ scale: 1, rotate: 0, opacity: 1 }}
                           exit={{ scale: 0, opacity: 0 }}
-                          transition={{ type: 'spring', damping: 14, stiffness: 200 }}
+                          transition={{ type: 'spring', damping: 14 }}
                           className={
                             cell === 'X'
-                              ? 'text-cyan-400 text-glow-cyan'
-                              : 'text-purple-400 text-glow-purple'
+                              ? 'text-[var(--primary-accent)]'
+                              : 'text-[var(--text-primary)]'
                           }
                         >
                           {cell}
@@ -365,111 +350,124 @@ export const TicTacToe = ({ setCurrentView }) => {
               })}
             </div>
 
-            {/* AI Thinking Overlay or Winner Announcement */}
+            {/* AI Calculating indicator */}
             {isAiThinking && (
-              <div className="mt-4 flex items-center justify-center gap-2 text-xs font-semibold text-purple-300">
+              <div className="mt-4 flex items-center justify-center gap-2 text-xs font-semibold text-[var(--primary-accent)]">
                 <Bot className="w-4 h-4 animate-bounce" />
-                <span>AI is calculating optimal move...</span>
+                <span>AI evaluating optimal response...</span>
               </div>
             )}
 
+            {/* Winner Announcement Banner */}
             {gameResult && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-6 p-4 rounded-2xl bg-white/5 border border-white/10 text-center"
+                className="mt-6 p-4 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-center space-y-2"
               >
-                <h3 className="font-['Orbitron'] font-bold text-lg text-white mb-1">
+                <h4 className="font-heading text-lg font-bold text-[var(--text-primary)]">
                   {gameResult.winner === 'draw'
-                    ? "It's a Stalemate Draw!"
+                    ? 'Game Tied!'
+                    : `Player ${gameResult.winner} Triumphs!`}
+                </h4>
+                <p className="text-xs text-[var(--text-secondary)] font-sans">
+                  {gameResult.winner === 'draw'
+                    ? 'Both sides played balanced moves.'
                     : gameMode === 'ai'
                     ? gameResult.winner === playerSymbol
-                      ? 'Victory! You Won!'
-                      : 'AI Outsmarted You!'
-                    : `Player ${gameResult.winner} Triumphs!`}
-                </h3>
-                <p className="text-xs text-slate-400">
-                  {gameResult.winner === 'draw'
-                    ? 'Remarkable defensive play from both sides.'
-                    : `Winning combo: cells [${gameResult.line?.map((n) => n + 1).join(', ')}]`}
+                      ? 'You successfully bypassed Minimax calculation!'
+                      : 'AI claimed 3-in-a-row.'
+                    : `Player ${gameResult.winner} connected 3 in a row.`}
                 </p>
+                <div className="pt-2">
+                  <button
+                    onClick={resetBoard}
+                    className="px-6 py-2 rounded-xl btn-primary text-xs font-bold inline-flex items-center gap-2"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Next Round</span>
+                  </button>
+                </div>
               </motion.div>
             )}
 
-            {/* Bottom Controls */}
-            <div className="flex items-center gap-3 mt-6">
+            {/* Controls */}
+            <div className="mt-6 flex items-center justify-between pt-4 border-t border-[var(--border-color)]">
               <button
                 onClick={resetBoard}
-                className="flex-1 py-3 px-4 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 border border-white/10 transition-all active:scale-95"
+                className="px-4 py-2 rounded-xl btn-secondary text-xs font-semibold flex items-center gap-1.5 focus:outline-none"
               >
-                <RotateCcw className="w-4 h-4" />
-                Restart Board
+                <RotateCcw className="w-3.5 h-3.5" />
+                Clear Board
               </button>
+
               <button
                 onClick={resetMatch}
-                className="py-3 px-4 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 border border-purple-500/40 transition-all active:scale-95"
+                className="px-4 py-2 rounded-xl border border-[var(--border-color)] text-xs text-[var(--text-secondary)] hover:text-red-400 hover:border-red-400/40 transition-colors flex items-center gap-1.5"
               >
-                <RefreshCw className="w-4 h-4" />
-                New Match
+                <RefreshCw className="w-3.5 h-3.5" />
+                Reset Match
               </button>
             </div>
           </div>
         </div>
 
-        {/* Scoreboard & Mode Information Column */}
+        {/* Scoreboard Column */}
         <div className="lg:col-span-5 space-y-6">
-          {/* Scoreboard */}
-          <div className="glass-panel rounded-3xl p-6 border border-white/10 shadow-xl">
-            <h3 className="font-['Orbitron'] font-bold text-sm text-white uppercase tracking-wider mb-5 flex items-center gap-2">
-              <Trophy className="w-4 h-4 text-purple-400" />
-              Match Scoreboard
-            </h3>
+          <div className="surface-card rounded-3xl p-6 sm:p-7 border border-[var(--border-color)] space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-[var(--border-color)]">
+              <h3 className="font-heading font-bold text-lg text-[var(--text-primary)] flex items-center gap-2">
+                <Trophy className="w-4 h-4 text-[var(--primary-accent)]" />
+                Match Scoreboard
+              </h3>
+              <span className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
+                {gameMode === 'ai' ? `vs AI (${aiDifficulty})` : '2 Players (PvP)'}
+              </span>
+            </div>
 
-            <div className="grid grid-cols-3 gap-3 text-center">
+            {/* Score Stats Grid */}
+            <div className="grid grid-cols-3 gap-3">
               {/* Player 1 */}
-              <div className="p-3.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/20">
-                <span className="text-[11px] font-bold text-cyan-300 uppercase block">
-                  {gameMode === 'ai' ? 'You (P1)' : 'Player X'}
-                </span>
-                <span className="font-['Orbitron'] text-3xl font-extrabold text-white mt-1 block">
+              <div className="p-4 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-center">
+                <p className="text-[11px] font-medium text-[var(--text-secondary)] truncate">
+                  {gameMode === 'ai' ? 'You' : 'Player X'}
+                </p>
+                <p className="font-mono-stats text-3xl font-extrabold text-[var(--primary-accent)] my-1">
                   {scores.player1}
-                </span>
-                <span className="text-[10px] text-slate-400">Wins</span>
+                </p>
+                <span className="text-[10px] text-[var(--text-secondary)]">Wins</span>
               </div>
 
               {/* Draws */}
-              <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
-                <span className="text-[11px] font-bold text-slate-400 uppercase block">
-                  Ties
-                </span>
-                <span className="font-['Orbitron'] text-3xl font-extrabold text-slate-300 mt-1 block">
+              <div className="p-4 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-center">
+                <p className="text-[11px] font-medium text-[var(--text-secondary)]">Draws</p>
+                <p className="font-mono-stats text-3xl font-extrabold text-[var(--text-primary)] my-1">
                   {scores.draws}
-                </span>
-                <span className="text-[10px] text-slate-400">Draws</span>
+                </p>
+                <span className="text-[10px] text-[var(--text-secondary)]">Ties</span>
               </div>
 
               {/* Player 2 or AI */}
-              <div className="p-3.5 rounded-2xl bg-purple-500/10 border border-purple-500/20">
-                <span className="text-[11px] font-bold text-purple-300 uppercase block">
+              <div className="p-4 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-center">
+                <p className="text-[11px] font-medium text-[var(--text-secondary)] truncate">
                   {gameMode === 'ai' ? 'AI Bot' : 'Player O'}
-                </span>
-                <span className="font-['Orbitron'] text-3xl font-extrabold text-white mt-1 block">
+                </p>
+                <p className="font-mono-stats text-3xl font-extrabold text-[var(--text-secondary)] my-1">
                   {scores.player2OrAI}
-                </span>
-                <span className="text-[10px] text-slate-400">Wins</span>
+                </p>
+                <span className="text-[10px] text-[var(--text-secondary)]">Wins</span>
               </div>
             </div>
-          </div>
 
-          {/* Minimax Algorithm Explainer */}
-          <div className="glass-panel rounded-3xl p-6 border border-white/10">
-            <h4 className="font-['Orbitron'] text-xs font-bold text-purple-300 uppercase tracking-widest mb-2 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-purple-400" />
-              Minimax Algorithm Powered
-            </h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              In <strong>Minimax (Hard)</strong> mode, the AI simulates every possible permutation of remaining moves and chooses the mathematically optimal pathway with alpha-beta pruning. It is practically unbeatable! Can you force a draw or spot an opening?
-            </p>
+            {/* Strategy Insight */}
+            <div className="p-4 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)] space-y-1.5 text-xs text-[var(--text-secondary)]">
+              <span className="font-heading font-bold text-[var(--primary-accent)] block text-sm">
+                Minimax Intelligence
+              </span>
+              <p className="leading-relaxed">
+                Minimax evaluates all remaining game paths depth-first. Securing corners or forcing forks is key to a tie or victory on Hard mode.
+              </p>
+            </div>
           </div>
         </div>
       </div>

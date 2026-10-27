@@ -63,7 +63,7 @@ export const Admin = ({ setCurrentView }) => {
     description: '',
     difficulty: 'Medium',
     badges: 'High Speed, Multiplayer',
-    accentColor: 'cyan',
+    accentColor: 'lime',
     icon: 'Gamepad2',
     category: 'Arcade',
     customUrl: '',
@@ -237,7 +237,7 @@ export const Admin = ({ setCurrentView }) => {
       description: game.description,
       difficulty: game.difficulty || 'Medium',
       badges: Array.isArray(game.badges) ? game.badges.join(', ') : game.badges || '',
-      accentColor: game.accentColor || 'cyan',
+      accentColor: game.accentColor || 'lime',
       icon: game.icon || 'Gamepad2',
       category: game.category || 'Arcade',
       customUrl: game.customUrl || '',
@@ -256,7 +256,7 @@ export const Admin = ({ setCurrentView }) => {
       description: '',
       difficulty: 'Medium',
       badges: 'Multiplayer, High Speed',
-      accentColor: 'cyan',
+      accentColor: 'lime',
       icon: 'Gamepad2',
       category: 'Arcade',
       customUrl: '',
@@ -282,18 +282,18 @@ export const Admin = ({ setCurrentView }) => {
               soundEffects.playClick();
               setCurrentView('home');
             }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-slate-300 hover:text-white glass-panel border border-white/10 hover:border-cyan-500/40 transition-all mb-3"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] surface-card hover:border-[var(--primary-accent-border)] transition-all mb-3"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Games
           </button>
           <div className="flex items-center gap-3">
-            <h1 className="font-['Orbitron'] text-3xl font-extrabold text-white flex items-center gap-2">
-              <ShieldAlert className="w-8 h-8 text-cyan-400" />
+            <h1 className="font-heading text-3xl font-extrabold text-[var(--text-primary)] flex items-center gap-2">
+              <ShieldAlert className="w-8 h-8 text-[var(--primary-accent)]" />
               GameZone Admin Dashboard
             </h1>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-[var(--text-secondary)] mt-1 font-sans">
             Delete users, add or edit games, and monitor MongoDB Atlas synchronization
           </p>
         </div>
@@ -301,9 +301,9 @@ export const Admin = ({ setCurrentView }) => {
         {/* Database Status Badge */}
         <div className="flex items-center gap-3">
           <div
-            className={`px-4 py-2 rounded-2xl glass-panel border flex items-center gap-2.5 text-xs font-bold ${
+            className={`px-4 py-2 rounded-2xl surface-card border flex items-center gap-2.5 text-xs font-bold ${
               dbStatus === 'connected'
-                ? 'border-emerald-500/40 text-emerald-300 bg-emerald-950/20'
+                ? 'border-[var(--primary-accent-border)] text-[var(--primary-accent)] bg-[var(--primary-accent-subtle)]'
                 : 'border-rose-500/40 text-rose-300 bg-rose-950/20'
             }`}
           >
@@ -311,7 +311,7 @@ export const Admin = ({ setCurrentView }) => {
             <span>MongoDB: {dbStatus === 'connected' ? 'Connected (Atlas)' : 'Disconnected / Local'}</span>
             <span
               className={`w-2.5 h-2.5 rounded-full ${
-                dbStatus === 'connected' ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'
+                dbStatus === 'connected' ? 'bg-[var(--primary-accent)] animate-pulse' : 'bg-rose-400'
               }`}
             />
           </div>
@@ -321,7 +321,7 @@ export const Admin = ({ setCurrentView }) => {
               soundEffects.playClick();
               loadAdminData();
             }}
-            className="p-2.5 rounded-xl glass-panel border border-white/10 hover:border-white/20 text-slate-300 hover:text-white transition-all"
+            className="p-2.5 rounded-xl surface-card border border-[var(--border-color)] hover:border-[var(--primary-accent-border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
             title="Refresh Data"
           >
             <RefreshCw className="w-4 h-4" />
@@ -331,53 +331,53 @@ export const Admin = ({ setCurrentView }) => {
 
       {/* Metrics Overview Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="glass-panel rounded-2xl p-5 border border-white/10 shadow-lg">
+        <div className="surface-card rounded-2xl p-5 border border-[var(--border-color)] shadow-sm">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
               Total Users
             </p>
-            <Users className="w-5 h-5 text-cyan-400" />
+            <Users className="w-5 h-5 text-[var(--primary-accent)]" />
           </div>
-          <p className="font-['Orbitron'] text-3xl font-extrabold text-white">
+          <p className="font-mono-stats text-3xl font-extrabold text-[var(--text-primary)]">
             {statsOverview?.totalUsers ?? usersList.length}
           </p>
-          <p className="text-[11px] text-slate-400 mt-1">Registered in MongoDB</p>
+          <p className="text-[11px] text-[var(--text-secondary)] mt-1">Registered in MongoDB</p>
         </div>
 
-        <div className="glass-panel rounded-2xl p-5 border border-white/10 shadow-lg">
+        <div className="surface-card rounded-2xl p-5 border border-[var(--border-color)] shadow-sm">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
               Active Games
             </p>
-            <Gamepad2 className="w-5 h-5 text-purple-400" />
+            <Gamepad2 className="w-5 h-5 text-[var(--primary-accent)]" />
           </div>
-          <p className="font-['Orbitron'] text-3xl font-extrabold text-white">
+          <p className="font-mono-stats text-3xl font-extrabold text-[var(--text-primary)]">
             {gamesList.filter((g) => g.active).length} / {gamesList.length}
           </p>
-          <p className="text-[11px] text-slate-400 mt-1">Playable on dashboard</p>
+          <p className="text-[11px] text-[var(--text-secondary)] mt-1">Playable on dashboard</p>
         </div>
 
-        <div className="glass-panel rounded-2xl p-5 border border-white/10 shadow-lg">
+        <div className="surface-card rounded-2xl p-5 border border-[var(--border-color)] shadow-sm">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
               Recorded Scores
             </p>
-            <Trophy className="w-5 h-5 text-yellow-400" />
+            <Trophy className="w-5 h-5 text-[var(--primary-accent)]" />
           </div>
-          <p className="font-['Orbitron'] text-3xl font-extrabold text-white">
+          <p className="font-mono-stats text-3xl font-extrabold text-[var(--text-primary)]">
             {statsOverview?.totalScores ?? scoresList.length}
           </p>
-          <p className="text-[11px] text-slate-400 mt-1">Hall of fame records</p>
+          <p className="text-[11px] text-[var(--text-secondary)] mt-1">Hall of fame records</p>
         </div>
 
-        <div className="glass-panel rounded-2xl p-5 border border-white/10 shadow-lg">
+        <div className="surface-card rounded-2xl p-5 border border-[var(--border-color)] shadow-sm">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
               Logged in Admin
             </p>
-            <UserCheck className="w-5 h-5 text-pink-400" />
+            <UserCheck className="w-5 h-5 text-[var(--primary-accent)]" />
           </div>
-          <p className="font-['Orbitron'] text-xl font-bold text-pink-400">
+          <p className="font-heading text-xl font-bold text-[var(--primary-accent)]">
             {currentUser.name}
           </p>
           <p className="text-[11px] text-slate-400 mt-1">{currentUser.email || currentUser.username}</p>
@@ -385,21 +385,21 @@ export const Admin = ({ setCurrentView }) => {
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
-        <div className="flex items-center gap-2 p-1 rounded-2xl bg-white/5 border border-white/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--border-color)] pb-4">
+        <div className="flex items-center gap-2 p-1 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)]">
           <button
             onClick={() => {
               soundEffects.playClick();
               setActiveTab('games');
             }}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
               activeTab === 'games'
-                ? 'bg-gradient-to-r from-cyan-400 to-blue-600 text-black shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-[var(--primary-accent)] text-[var(--btn-text-on-accent)] font-bold'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
             }`}
           >
             <Gamepad2 className="w-4 h-4" />
-            Games Management ({gamesList.length})
+            Games ({gamesList.length})
           </button>
 
           <button
@@ -407,14 +407,14 @@ export const Admin = ({ setCurrentView }) => {
               soundEffects.playClick();
               setActiveTab('users');
             }}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
               activeTab === 'users'
-                ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-[var(--primary-accent)] text-[var(--btn-text-on-accent)] font-bold'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
             }`}
           >
             <Users className="w-4 h-4" />
-            Users &amp; Deletion ({usersList.length})
+            Users ({usersList.length})
           </button>
 
           <button
@@ -422,24 +422,24 @@ export const Admin = ({ setCurrentView }) => {
               soundEffects.playClick();
               setActiveTab('scores');
             }}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
               activeTab === 'scores'
-                ? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-[var(--primary-accent)] text-[var(--btn-text-on-accent)] font-bold'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
             }`}
           >
             <Trophy className="w-4 h-4" />
-            Leaderboard Records ({scoresList.length})
+            Leaderboard ({scoresList.length})
           </button>
         </div>
 
         {activeTab === 'games' && (
           <button
             onClick={openCreateModal}
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 text-black font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-cyan-500/25 hover:shadow-cyan-400/40 transition-all active:scale-95"
+            className="px-5 py-2.5 rounded-xl btn-primary text-xs font-bold flex items-center justify-center gap-1.5 focus:outline-none"
           >
             <Plus className="w-4 h-4" />
-            + Add New Game
+            Add Game
           </button>
         )}
       </div>
@@ -448,13 +448,13 @@ export const Admin = ({ setCurrentView }) => {
       {activeTab === 'games' && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="font-['Orbitron'] text-lg font-bold text-white flex items-center gap-2">
-              <Gamepad2 className="w-5 h-5 text-cyan-400" />
+            <h2 className="font-heading text-lg font-bold text-[var(--text-primary)] flex items-center gap-2">
+              <Gamepad2 className="w-5 h-5 text-[var(--primary-accent)]" />
               Game Catalog &amp; Custom Games
             </h2>
             <button
               onClick={openCreateModal}
-              className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1"
+              className="text-xs text-[var(--primary-accent)] hover:underline font-semibold flex items-center gap-1"
             >
               <Plus className="w-3.5 h-3.5" />
               Add another game
@@ -465,8 +465,8 @@ export const Admin = ({ setCurrentView }) => {
             {gamesList.map((game) => (
               <div
                 key={game._id || game.gameId}
-                className={`glass-panel rounded-3xl p-6 border transition-all duration-300 relative flex flex-col justify-between ${
-                  game.active ? 'border-white/10' : 'border-rose-500/30 opacity-70'
+                className={`surface-card rounded-3xl p-6 border transition-all duration-300 relative flex flex-col justify-between ${
+                  game.active ? 'border-[var(--border-color)]' : 'border-rose-500/30 opacity-70'
                 }`}
               >
                 <div>
@@ -474,23 +474,23 @@ export const Admin = ({ setCurrentView }) => {
                     <span
                       className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border uppercase tracking-widest ${
                         game.active
-                          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                          ? 'badge-lime'
                           : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
                       }`}
                     >
                       {game.active ? 'Active' : 'Hidden'}
                     </span>
 
-                    <span className="text-xs font-bold text-slate-400 uppercase bg-white/5 px-2.5 py-0.5 rounded-md border border-white/5">
+                    <span className="text-xs font-semibold text-[var(--text-secondary)] uppercase bg-[var(--bg-elevated)] px-2.5 py-0.5 rounded-md border border-[var(--border-color)]">
                       {game.difficulty}
                     </span>
                   </div>
 
-                  <h3 className="font-['Orbitron'] font-bold text-xl text-white mb-1">
+                  <h3 className="font-heading font-bold text-xl text-[var(--text-primary)] mb-1">
                     {game.title}
                   </h3>
-                  <p className="text-xs text-slate-400 font-semibold mb-3">{game.tagline}</p>
-                  <p className="text-xs text-slate-300 leading-relaxed mb-4 line-clamp-3">
+                  <p className="text-xs text-[var(--text-secondary)] font-semibold mb-3">{game.tagline}</p>
+                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-4 line-clamp-3">
                     {game.description}
                   </p>
 
@@ -499,7 +499,7 @@ export const Admin = ({ setCurrentView }) => {
                     {game.badges?.map((b, idx) => (
                       <span
                         key={idx}
-                        className="text-[10px] px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-300"
+                        className="text-[10px] px-2 py-0.5 rounded-md bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-secondary)]"
                       >
                         {b}
                       </span>
@@ -508,13 +508,13 @@ export const Admin = ({ setCurrentView }) => {
                 </div>
 
                 {/* Card Action Controls: Edit, Hide/Show, Delete */}
-                <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-2">
+                <div className="pt-4 border-t border-[var(--border-color)] flex items-center justify-between gap-2">
                   <button
                     onClick={() => handleToggleGameStatus(game)}
-                    className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
+                    className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 border transition-all ${
                       game.active
-                        ? 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
-                        : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                        ? 'btn-secondary'
+                        : 'badge-lime'
                     }`}
                   >
                     {game.active ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
@@ -523,7 +523,7 @@ export const Admin = ({ setCurrentView }) => {
 
                   <button
                     onClick={() => openEditModal(game)}
-                    className="p-2.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 transition-all flex items-center gap-1 text-xs font-bold"
+                    className="p-2.5 rounded-xl btn-secondary text-[var(--primary-accent)] flex items-center gap-1 text-xs font-semibold"
                     title="Edit Game Details"
                   >
                     <Edit className="w-4 h-4" />
@@ -532,7 +532,7 @@ export const Admin = ({ setCurrentView }) => {
 
                   <button
                     onClick={() => setDeleteConfirmGame(game)}
-                    className="p-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-all"
+                    className="p-2.5 rounded-xl border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-all"
                     title="Delete Game"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -550,25 +550,25 @@ export const Admin = ({ setCurrentView }) => {
           {/* User Search Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
               <input
                 type="text"
                 placeholder="Search user by name, username, or email..."
                 value={userSearch}
                 onChange={(e) => setUserSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-cyan-400 transition-colors"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] text-xs focus:outline-none focus:border-[var(--primary-accent)] transition-colors"
               />
             </div>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[var(--text-secondary)]">
               Showing <strong>{filteredUsers.length}</strong> of <strong>{usersList.length}</strong> registered players
             </p>
           </div>
 
           {/* Users Table */}
-          <div className="glass-panel rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
+          <div className="surface-card rounded-3xl border border-[var(--border-color)] shadow-xl overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-300">
-                <thead className="text-[11px] uppercase tracking-wider text-slate-400 bg-white/5 border-b border-white/10 font-['Orbitron']">
+              <table className="w-full text-left text-xs text-[var(--text-secondary)] font-sans">
+                <thead className="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] bg-[var(--bg-elevated)] border-b border-[var(--border-color)] font-heading font-bold">
                   <tr>
                     <th scope="col" className="px-6 py-4">Player / Photo</th>
                     <th scope="col" className="px-6 py-4">Email</th>
@@ -579,16 +579,16 @@ export const Admin = ({ setCurrentView }) => {
                     <th scope="col" className="px-6 py-4 text-right">Delete &amp; Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-[var(--border-color)]">
                   {filteredUsers.length === 0 ? (
                     <tr>
-                      <td colSpan="7" className="text-center py-10 text-slate-400 text-xs">
+                      <td colSpan="7" className="text-center py-10 text-[var(--text-secondary)] text-xs">
                         No users found in MongoDB.
                       </td>
                     </tr>
                   ) : (
                     filteredUsers.map((user) => (
-                      <tr key={user._id || user.id} className="hover:bg-white/5 transition-colors">
+                      <tr key={user._id || user.id} className="hover:bg-[var(--bg-elevated)] transition-colors">
                         {/* Player Profile & Photo */}
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
@@ -596,23 +596,23 @@ export const Admin = ({ setCurrentView }) => {
                               <img
                                 src={user.photo}
                                 alt={user.name}
-                                className="w-10 h-10 rounded-xl object-cover border border-cyan-400/40 shadow-sm"
+                                className="w-10 h-10 rounded-xl object-cover border border-[var(--primary-accent-border)]"
                               />
                             ) : (
-                              <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-xl">
+                              <div className="w-10 h-10 rounded-xl bg-[var(--primary-accent-subtle)] border border-[var(--primary-accent-border)] text-[var(--primary-accent)] flex items-center justify-center text-xl">
                                 {user.avatar || '🎮'}
                               </div>
                             )}
                             <div>
-                              <p className="font-bold text-white text-sm">{user.name}</p>
-                              <p className="text-[10px] text-slate-400">@{user.username}</p>
+                              <p className="font-bold text-[var(--text-primary)] text-sm">{user.name}</p>
+                              <p className="text-[10px] text-[var(--text-secondary)] font-mono-stats">@{user.username}</p>
                             </div>
                           </div>
                         </td>
 
                         {/* Email */}
-                        <td className="px-6 py-4 text-slate-400">
-                          {user.email || <span className="text-slate-600">None provided</span>}
+                        <td className="px-6 py-4 text-[var(--text-secondary)]">
+                          {user.email || <span className="opacity-50">None provided</span>}
                         </td>
 
                         {/* Role */}
@@ -620,8 +620,8 @@ export const Admin = ({ setCurrentView }) => {
                           <span
                             className={`px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider ${
                               user.role === 'admin'
-                                ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
-                                : 'bg-slate-500/20 text-slate-400 border-slate-500/30'
+                                ? 'badge-lime'
+                                : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] border-[var(--border-color)]'
                             }`}
                           >
                             {user.role || 'player'}
@@ -629,12 +629,12 @@ export const Admin = ({ setCurrentView }) => {
                         </td>
 
                         {/* Games Played */}
-                        <td className="px-6 py-4 font-mono font-semibold text-slate-200">
+                        <td className="px-6 py-4 font-mono-stats font-semibold text-[var(--text-primary)]">
                           {user.stats?.totalGamesPlayed ?? 0}
                         </td>
 
                         {/* Wins */}
-                        <td className="px-6 py-4 font-mono font-semibold text-emerald-400">
+                        <td className="px-6 py-4 font-mono-stats font-semibold text-[var(--primary-accent)]">
                           {user.stats?.totalWins ?? 0}
                         </td>
 
@@ -650,10 +650,10 @@ export const Admin = ({ setCurrentView }) => {
                           <div className="flex items-center justify-end gap-2">
                             <button
                               onClick={() => handleToggleUserRole(user)}
-                              className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold border transition-colors ${
+                              className={`px-2.5 py-1.5 rounded-lg text-[11px] font-semibold border transition-colors ${
                                 user.role === 'admin'
-                                  ? 'bg-amber-500/10 text-amber-300 border-amber-500/30 hover:bg-amber-500/20'
-                                  : 'bg-purple-500/10 text-purple-300 border-purple-500/30 hover:bg-purple-500/20'
+                                  ? 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] border-[var(--border-color)]'
+                                  : 'badge-lime hover:opacity-90'
                               }`}
                               title={user.role === 'admin' ? 'Demote to Player' : 'Promote to Admin'}
                             >
@@ -683,10 +683,10 @@ export const Admin = ({ setCurrentView }) => {
       {/* TAB 3: SCORES MANAGEMENT */}
       {activeTab === 'scores' && (
         <div className="space-y-4">
-          <div className="glass-panel rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
+          <div className="surface-card rounded-3xl border border-[var(--border-color)] shadow-xl overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-300">
-                <thead className="text-[11px] uppercase tracking-wider text-slate-400 bg-white/5 border-b border-white/10 font-['Orbitron']">
+              <table className="w-full text-left text-xs text-[var(--text-secondary)] font-sans">
+                <thead className="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] bg-[var(--bg-elevated)] border-b border-[var(--border-color)] font-heading font-bold">
                   <tr>
                     <th scope="col" className="px-6 py-4">Player</th>
                     <th scope="col" className="px-6 py-4">Game</th>
@@ -695,26 +695,26 @@ export const Admin = ({ setCurrentView }) => {
                     <th scope="col" className="px-6 py-4">Recorded Date</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-[var(--border-color)]">
                   {scoresList.length === 0 ? (
                     <tr>
-                      <td colSpan="5" className="text-center py-10 text-slate-400 text-xs">
+                      <td colSpan="5" className="text-center py-10 text-[var(--text-secondary)] text-xs">
                         No scores recorded in MongoDB yet.
                       </td>
                     </tr>
                   ) : (
                     scoresList.map((sc) => (
-                      <tr key={sc._id} className="hover:bg-white/5 transition-colors">
-                        <td className="px-6 py-4 font-bold text-white flex items-center gap-2">
+                      <tr key={sc._id} className="hover:bg-[var(--bg-elevated)] transition-colors">
+                        <td className="px-6 py-4 font-bold text-[var(--text-primary)] flex items-center gap-2">
                           <span>{sc.playerAvatar || '🎮'}</span>
                           <span>{sc.playerName}</span>
                         </td>
-                        <td className="px-6 py-4 text-cyan-300">{sc.game}</td>
-                        <td className="px-6 py-4 font-mono">{sc.score}</td>
-                        <td className="px-6 py-4 font-['Orbitron'] font-bold text-white">
+                        <td className="px-6 py-4 font-semibold text-[var(--primary-accent)]">{sc.game}</td>
+                        <td className="px-6 py-4 font-mono-stats">{sc.score}</td>
+                        <td className="px-6 py-4 font-mono-stats font-bold text-[var(--text-primary)]">
                           {sc.points} XP
                         </td>
-                        <td className="px-6 py-4 text-slate-500">{sc.date}</td>
+                        <td className="px-6 py-4 text-[var(--text-secondary)]">{sc.date}</td>
                       </tr>
                     ))
                   )}
@@ -728,31 +728,31 @@ export const Admin = ({ setCurrentView }) => {
       {/* ADD / EDIT GAME MODAL */}
       <AnimatePresence>
         {gameModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm overflow-y-auto">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-lg rounded-3xl glass-panel-glow p-6 sm:p-8 border border-white/10 shadow-2xl my-8"
+              className="relative w-full max-w-lg rounded-3xl surface-card p-6 sm:p-8 border border-[var(--border-color)] shadow-2xl my-8"
             >
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-[var(--primary-accent-subtle)] text-[var(--primary-accent)] border border-[var(--primary-accent-border)] flex items-center justify-center">
                     <Gamepad2 className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-['Orbitron'] font-bold text-lg text-white">
+                    <h3 className="font-heading font-bold text-lg text-[var(--text-primary)]">
                       {editingGame ? 'Edit Game Section' : 'Add New Game'}
                     </h3>
-                    <p className="text-xs text-slate-400">
-                      Syncs directly with MongoDB Atlas cluster
+                    <p className="text-xs text-[var(--text-secondary)] font-sans">
+                      Syncs directly with MongoDB cluster
                     </p>
                   </div>
                 </div>
 
                 <button
                   onClick={() => setGameModalOpen(false)}
-                  className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10"
+                  className="p-2 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
                 >
                   <XCircle className="w-5 h-5" />
                 </button>
@@ -769,12 +769,12 @@ export const Admin = ({ setCurrentView }) => {
                     placeholder="e.g. Memory Matrix or Cyber Racer"
                     value={gameForm.title}
                     onChange={(e) => setGameForm({ ...gameForm, title: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] text-xs focus:outline-none focus:border-[var(--primary-accent)]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1 uppercase tracking-wider">
                     Tagline
                   </label>
                   <input
@@ -782,12 +782,12 @@ export const Admin = ({ setCurrentView }) => {
                     placeholder="e.g. High Speed & Reflexes"
                     value={gameForm.tagline}
                     onChange={(e) => setGameForm({ ...gameForm, tagline: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] text-xs focus:outline-none focus:border-[var(--primary-accent)]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1 uppercase tracking-wider">
                     Description *
                   </label>
                   <textarea
@@ -796,19 +796,19 @@ export const Admin = ({ setCurrentView }) => {
                     placeholder="Describe the gameplay, rules, and objective..."
                     value={gameForm.description}
                     onChange={(e) => setGameForm({ ...gameForm, description: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] text-xs focus:outline-none focus:border-[var(--primary-accent)]"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1 uppercase tracking-wider">
+                    <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1 uppercase tracking-wider">
                       Difficulty
                     </label>
                     <select
                       value={gameForm.difficulty}
                       onChange={(e) => setGameForm({ ...gameForm, difficulty: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#0f1120] border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-400"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] text-xs focus:outline-none focus:border-[var(--primary-accent)]"
                     >
                       <option value="Easy">Easy</option>
                       <option value="Medium">Medium</option>
@@ -819,25 +819,22 @@ export const Admin = ({ setCurrentView }) => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1 uppercase tracking-wider">
+                    <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1 uppercase tracking-wider">
                       Accent Theme
                     </label>
                     <select
                       value={gameForm.accentColor}
                       onChange={(e) => setGameForm({ ...gameForm, accentColor: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#0f1120] border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-400"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] text-xs focus:outline-none focus:border-[var(--primary-accent)]"
                     >
-                      <option value="cyan">Neon Cyan</option>
-                      <option value="purple">Neon Purple</option>
-                      <option value="pink">Neon Pink</option>
-                      <option value="amber">Warm Amber</option>
-                      <option value="emerald">Emerald Green</option>
+                      <option value="lime">Brand Lime</option>
+                      <option value="charcoal">Charcoal Neutral</option>
                     </select>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1 uppercase tracking-wider">
                     Badges (comma separated)
                   </label>
                   <input
@@ -845,33 +842,33 @@ export const Admin = ({ setCurrentView }) => {
                     placeholder="Reflexes, Leaderboard, Pro"
                     value={gameForm.badges}
                     onChange={(e) => setGameForm({ ...gameForm, badges: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] text-xs focus:outline-none focus:border-[var(--primary-accent)]"
                   />
                 </div>
 
                 <div className="flex items-center gap-3 pt-2">
-                  <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+                  <label className="flex items-center gap-2 cursor-pointer text-xs text-[var(--text-secondary)]">
                     <input
                       type="checkbox"
                       checked={gameForm.active}
                       onChange={(e) => setGameForm({ ...gameForm, active: e.target.checked })}
-                      className="rounded accent-cyan-500 w-4 h-4"
+                      className="rounded accent-[var(--primary-accent)] w-4 h-4"
                     />
                     <span>Publish game immediately (Visible to all players)</span>
                   </label>
                 </div>
 
-                <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-[var(--border-color)]">
                   <button
                     type="button"
                     onClick={() => setGameModalOpen(false)}
-                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white"
+                    className="px-4 py-2.5 rounded-xl text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 text-black font-bold text-xs shadow-md shadow-cyan-500/25 hover:shadow-cyan-400/40"
+                    className="px-6 py-2.5 rounded-xl btn-primary text-xs font-bold"
                   >
                     {editingGame ? 'Save Changes' : 'Create Game'}
                   </button>
@@ -896,24 +893,24 @@ export const Admin = ({ setCurrentView }) => {
                 <AlertTriangle className="w-7 h-7" />
               </div>
 
-              <h3 className="font-['Orbitron'] text-lg font-bold text-white">
+              <h3 className="font-heading text-lg font-bold text-white">
                 Delete User Account?
               </h3>
-              <p className="text-xs text-slate-300 mt-1">
+              <p className="text-xs text-slate-300 mt-1 font-sans">
                 Are you sure you want to permanently delete player{' '}
-                <strong className="text-rose-400">@{deleteConfirmUser.username}</strong>? This action will remove all their data from MongoDB.
+                <strong className="text-red-400">@{deleteConfirmUser.username}</strong>? This action will remove all their data from MongoDB.
               </p>
 
               <div className="flex items-center gap-3 mt-6">
                 <button
                   onClick={() => setDeleteConfirmUser(null)}
-                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white border border-white/10 bg-white/5"
+                  className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white border border-white/10 bg-white/5"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmDeleteUser}
-                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-rose-500 to-red-600 shadow-lg shadow-rose-500/30 hover:scale-102"
+                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 shadow-lg transition-all"
                 >
                   Yes, Delete User
                 </button>
@@ -926,34 +923,34 @@ export const Admin = ({ setCurrentView }) => {
       {/* CONFIRM DELETE GAME MODAL */}
       <AnimatePresence>
         {deleteConfirmGame && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-sm rounded-3xl glass-panel p-6 border border-rose-500/40 shadow-2xl text-center"
+              className="w-full max-w-sm rounded-3xl surface-card p-6 border border-red-500/40 shadow-2xl text-center"
             >
-              <div className="w-14 h-14 rounded-2xl bg-rose-500/20 border-2 border-rose-400 flex items-center justify-center mx-auto mb-3 text-rose-400 shadow-lg shadow-rose-500/30">
+              <div className="w-14 h-14 rounded-2xl bg-red-500/20 border-2 border-red-400 flex items-center justify-center mx-auto mb-3 text-red-400 shadow-lg">
                 <AlertTriangle className="w-7 h-7" />
               </div>
 
-              <h3 className="font-['Orbitron'] text-lg font-bold text-white">
+              <h3 className="font-heading text-lg font-bold text-white">
                 Delete Game?
               </h3>
-              <p className="text-xs text-slate-300 mt-1">
-                Are you sure you want to remove <strong className="text-cyan-300">{deleteConfirmGame.title}</strong> from GameZone?
+              <p className="text-xs text-slate-300 mt-1 font-sans">
+                Are you sure you want to remove <strong className="text-[var(--primary-accent)]">{deleteConfirmGame.title}</strong> from GameZone?
               </p>
 
               <div className="flex items-center gap-3 mt-6">
                 <button
                   onClick={() => setDeleteConfirmGame(null)}
-                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white border border-white/10 bg-white/5"
+                  className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white border border-white/10 bg-white/5"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmDeleteGame}
-                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-rose-500 to-red-600 shadow-lg shadow-rose-500/30 hover:scale-102"
+                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 shadow-lg transition-all"
                 >
                   Yes, Delete Game
                 </button>

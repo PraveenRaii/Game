@@ -37,41 +37,23 @@ export const ToastProvider = ({ children }) => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, x: 50, scale: 0.9 }}
               transition={{ duration: 0.25, ease: 'easeOut' }}
-              className="pointer-events-auto rounded-xl p-3.5 backdrop-blur-xl shadow-xl flex items-start gap-3 border transition-all"
-              style={{
-                background:
-                  toast.type === 'success'
-                    ? 'rgba(6, 40, 32, 0.9)'
-                    : toast.type === 'error'
-                    ? 'rgba(45, 12, 18, 0.9)'
-                    : toast.type === 'achievement'
-                    ? 'rgba(38, 16, 56, 0.9)'
-                    : 'rgba(15, 23, 42, 0.9)',
-                borderColor:
-                  toast.type === 'success'
-                    ? 'rgba(16, 185, 129, 0.4)'
-                    : toast.type === 'error'
-                    ? 'rgba(239, 68, 68, 0.4)'
-                    : toast.type === 'achievement'
-                    ? 'rgba(168, 85, 247, 0.5)'
-                    : 'rgba(56, 189, 248, 0.4)',
-              }}
+              className="pointer-events-auto rounded-2xl p-4 surface-card shadow-2xl flex items-start gap-3 border border-[var(--border-color)] transition-all"
             >
               <div className="mt-0.5 shrink-0">
-                {toast.type === 'success' && <CheckCircle2 className="w-5 h-5 text-emerald-400" />}
-                {toast.type === 'error' && <AlertCircle className="w-5 h-5 text-rose-400" />}
-                {toast.type === 'achievement' && <Sparkles className="w-5 h-5 text-purple-400 animate-spin" />}
-                {toast.type === 'info' && <Info className="w-5 h-5 text-cyan-400" />}
+                {toast.type === 'success' && <CheckCircle2 className="w-5 h-5 text-[var(--primary-accent)]" />}
+                {toast.type === 'error' && <AlertCircle className="w-5 h-5 text-red-400" />}
+                {toast.type === 'achievement' && <Sparkles className="w-5 h-5 text-[var(--primary-accent)]" />}
+                {toast.type === 'info' && <Info className="w-5 h-5 text-[var(--primary-accent)]" />}
               </div>
 
               <div className="flex-1 min-w-0">
                 {toast.title && (
-                  <h4 className="text-sm font-semibold text-white tracking-wide">
+                  <h4 className="text-sm font-heading font-bold text-[var(--text-primary)] tracking-wide">
                     {toast.title}
                   </h4>
                 )}
                 {toast.message && (
-                  <p className="text-xs text-slate-300 mt-0.5 leading-relaxed">
+                  <p className="text-xs text-[var(--text-secondary)] mt-0.5 leading-relaxed font-sans">
                     {toast.message}
                   </p>
                 )}
@@ -79,7 +61,7 @@ export const ToastProvider = ({ children }) => {
 
               <button
                 onClick={() => removeToast(toast.id)}
-                className="text-slate-400 hover:text-white transition-colors p-1"
+                className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-1"
                 aria-label="Close notification"
               >
                 <X className="w-4 h-4" />

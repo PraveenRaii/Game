@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Lock, Mail, User, Sparkles, LogIn, UserPlus, Gamepad2, AlertCircle, Camera, Upload } from 'lucide-react';
+import { X, Lock, Mail, User, LogIn, UserPlus, Gamepad2, AlertCircle, Camera } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { soundEffects } from '../audio/soundEffects';
@@ -87,7 +87,7 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
     if (res.success) {
       addToast({
         title: `Welcome to GameZone, ${res.user.name}!`,
-        message: 'Your player profile is created & stored in MongoDB.',
+        message: 'Your player profile is created & stored.',
         type: 'success',
       });
       onClose();
@@ -108,13 +108,13 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
       <motion.div
-        initial={{ opacity: 0, scale: 0.92, y: 20 }}
+        initial={{ opacity: 0, scale: 0.94, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.92, y: 20 }}
+        exit={{ opacity: 0, scale: 0.94, y: 15 }}
         transition={{ duration: 0.2 }}
-        className="relative w-full max-w-md rounded-3xl glass-panel-glow p-6 sm:p-8 border border-white/10 shadow-2xl overflow-hidden my-8"
+        className="relative w-full max-w-md rounded-3xl surface-card p-6 sm:p-8 border border-[var(--border-color)] shadow-2xl overflow-hidden my-8"
       >
         {/* Close Button */}
         <button
@@ -122,7 +122,7 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
             soundEffects.playClick();
             onClose();
           }}
-          className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+          className="absolute top-5 right-5 p-2 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
           aria-label="Close authentication modal"
         >
           <X className="w-5 h-5" />
@@ -130,33 +130,31 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
 
         {/* Modal Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 to-purple-600 p-[2px] shadow-lg mb-3">
-            <div className="w-full h-full bg-[#0a0c1a] rounded-[14px] flex items-center justify-center">
-              <Gamepad2 className="w-6 h-6 text-cyan-400" />
-            </div>
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)] mb-3 text-[var(--primary-accent)]">
+            <Gamepad2 className="w-6 h-6" />
           </div>
-          <h2 className="font-['Orbitron'] text-2xl font-bold text-white tracking-wide">
+          <h2 className="font-heading text-2xl font-bold text-[var(--text-primary)] tracking-tight">
             {activeTab === 'signin' ? 'Player Sign In' : 'Create Gamer Account'}
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-[var(--text-secondary)] mt-1 font-sans">
             {activeTab === 'signin'
-              ? 'Enter your credentials to access your MongoDB saved profile'
+              ? 'Enter your credentials to access your saved profile'
               : 'Pick your avatar or upload photo & join GameZone'}
           </p>
         </div>
 
         {/* Tab Toggle */}
-        <div className="grid grid-cols-2 p-1 rounded-xl bg-white/5 border border-white/10 mb-5">
+        <div className="grid grid-cols-2 p-1 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] mb-5">
           <button
             onClick={() => {
               soundEffects.playClick();
               setActiveTab('signin');
               setErrorMsg('');
             }}
-            className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+            className={`py-2 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
               activeTab === 'signin'
-                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-black shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-[var(--primary-accent)] text-[var(--btn-text-on-accent)] font-bold'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
             }`}
           >
             <LogIn className="w-3.5 h-3.5" />
@@ -168,10 +166,10 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
               setActiveTab('signup');
               setErrorMsg('');
             }}
-            className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+            className={`py-2 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
               activeTab === 'signup'
-                ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-[var(--primary-accent)] text-[var(--btn-text-on-accent)] font-bold'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
             }`}
           >
             <UserPlus className="w-3.5 h-3.5" />
@@ -181,7 +179,7 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
 
         {/* Error Alert */}
         {errorMsg && (
-          <div className="mb-4 p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-center gap-2 text-xs text-rose-300">
+          <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/25 flex items-center gap-2 text-xs text-red-500">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{errorMsg}</span>
           </div>
@@ -191,40 +189,40 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
         {activeTab === 'signin' ? (
           <form onSubmit={handleSignIn} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5 font-sans">
                 Username or Email
               </label>
               <div className="relative">
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
                 <input
                   type="text"
-                  placeholder="e.g. CyberViper or admin"
+                  placeholder="e.g. GamerPro or player"
                   value={signInData.identifier}
                   onChange={(e) => setSignInData({ ...signInData, identifier: e.target.value })}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-cyan-500 transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] text-sm focus:outline-none focus:border-[var(--primary-accent)] transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5 font-sans">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
                 <input
                   type="password"
                   placeholder="••••••••"
                   value={signInData.password}
                   onChange={(e) => setSignInData({ ...signInData, password: e.target.value })}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-cyan-500 transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] text-sm focus:outline-none focus:border-[var(--primary-accent)] transition-colors"
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 text-black font-bold text-sm shadow-lg shadow-cyan-500/25 hover:shadow-cyan-400/40 hover:scale-[1.01] active:scale-95 transition-all"
+              className="w-full py-3 rounded-xl btn-primary font-bold text-sm tracking-wide"
             >
               Enter GameZone
             </button>
@@ -235,12 +233,12 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
             {/* Photo & Avatar Selector */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-medium text-slate-300">
+                <label className="block text-xs font-medium text-[var(--text-secondary)]">
                   Profile Photo or Avatar
                 </label>
                 <label
                   htmlFor="signup-photo-input"
-                  className="text-[11px] font-bold text-cyan-400 hover:text-cyan-300 cursor-pointer flex items-center gap-1"
+                  className="text-[11px] font-semibold text-[var(--primary-accent)] hover:underline cursor-pointer flex items-center gap-1"
                 >
                   <Camera className="w-3.5 h-3.5" />
                   Upload Photo
@@ -255,20 +253,20 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
               </div>
 
               {signUpData.photo ? (
-                <div className="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-cyan-400/30">
+                <div className="flex items-center gap-3 p-2 rounded-xl bg-[var(--bg-elevated)] border border-[var(--primary-accent-border)]">
                   <img
                     src={signUpData.photo}
                     alt="Preview"
-                    className="w-10 h-10 rounded-xl object-cover border border-cyan-400"
+                    className="w-10 h-10 rounded-xl object-cover border border-[var(--primary-accent)]"
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold text-white truncate">Custom Photo Loaded</p>
-                    <p className="text-[10px] text-cyan-300">Will be saved to your MongoDB profile</p>
+                    <p className="text-xs font-bold text-[var(--text-primary)] truncate">Photo Selected</p>
+                    <p className="text-[10px] text-[var(--primary-accent)]">Ready for profile</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setSignUpData({ ...signUpData, photo: '' })}
-                    className="text-xs text-rose-400 hover:underline"
+                    className="text-xs text-red-500 hover:underline"
                   >
                     Remove
                   </button>
@@ -282,8 +280,8 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
                       onClick={() => setSignUpData({ ...signUpData, avatar: av })}
                       className={`h-9 text-base rounded-xl flex items-center justify-center transition-all ${
                         signUpData.avatar === av
-                          ? 'bg-purple-600/40 border-2 border-purple-400 shadow-md scale-105'
-                          : 'bg-white/5 border border-white/10 hover:bg-white/10'
+                          ? 'bg-[var(--primary-accent-subtle)] border-2 border-[var(--primary-accent)] scale-105'
+                          : 'bg-[var(--bg-elevated)] border border-[var(--border-color)] hover:border-[var(--primary-accent-border)]'
                       }`}
                     >
                       {av}
@@ -295,7 +293,7 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
 
             <div className="grid grid-cols-2 gap-2.5">
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
                   Display Name
                 </label>
                 <input
@@ -303,11 +301,11 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
                   placeholder="Apex Player"
                   value={signUpData.name}
                   onChange={(e) => setSignUpData({ ...signUpData, name: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-purple-400"
+                  className="w-full px-3 py-2 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] text-xs focus:outline-none focus:border-[var(--primary-accent)]"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
                   Username *
                 </label>
                 <input
@@ -315,13 +313,13 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
                   placeholder="Apex99"
                   value={signUpData.username}
                   onChange={(e) => setSignUpData({ ...signUpData, username: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-purple-400"
+                  className="w-full px-3 py-2 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] text-xs focus:outline-none focus:border-[var(--primary-accent)]"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
                 Email (Optional)
               </label>
               <input
@@ -329,12 +327,12 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
                 placeholder="player@example.com"
                 value={signUpData.email}
                 onChange={(e) => setSignUpData({ ...signUpData, email: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-purple-400"
+                className="w-full px-3 py-2 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] text-xs focus:outline-none focus:border-[var(--primary-accent)]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
                 Password *
               </label>
               <input
@@ -342,13 +340,13 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
                 placeholder="At least 4 characters"
                 value={signUpData.password}
                 onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-purple-400"
+                className="w-full px-3 py-2 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] text-xs focus:outline-none focus:border-[var(--primary-accent)]"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white font-bold text-sm shadow-lg shadow-purple-500/25 hover:shadow-purple-400/40 hover:scale-[1.01] active:scale-95 transition-all mt-2"
+              className="w-full py-3 rounded-xl btn-primary font-bold text-sm tracking-wide mt-2"
             >
               Create Account &amp; Play
             </button>
@@ -356,11 +354,11 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
         )}
 
         {/* Guest Play Footer */}
-        <div className="mt-5 pt-4 border-t border-white/10 text-center">
-          <p className="text-xs text-slate-400 mb-2">Want to jump right into the action?</p>
+        <div className="mt-5 pt-4 border-t border-[var(--border-color)] text-center">
+          <p className="text-xs text-[var(--text-secondary)] mb-2">Want to jump right into the action?</p>
           <button
             onClick={handleGuestContinue}
-            className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 underline underline-offset-4 transition-colors"
+            className="text-xs font-semibold text-[var(--primary-accent)] hover:underline underline-offset-4 transition-colors"
           >
             Continue as Guest Player →
           </button>

@@ -19,7 +19,7 @@ import { GameStatsProvider } from './context/GameStatsContext';
 import { ThemeProvider } from './context/ThemeContext';
 
 function GameApp() {
-  const [currentView, setCurrentView] = useState('home'); // 'home' | 'guess-game' | 'tic-tac-toe' | 'puzzle-game' | 'car-racing' | 'leaderboard' | 'achievements' | 'about' | 'auth' | 'admin'
+  const [currentView, setCurrentView] = useState('home'); // 'home' | 'games' | 'guess-game' | 'tic-tac-toe' | 'puzzle-game' | 'car-racing' | 'leaderboard' | 'achievements' | 'about' | 'auth' | 'admin'
   const [authModalState, setAuthModalState] = useState({ isOpen: false, tab: 'signin' });
   const [profileModalOpen, setProfileModalOpen] = useState(false);
 
@@ -45,18 +45,17 @@ function GameApp() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--bg-main)] text-[var(--text-primary)] relative selection:bg-cyan-500 selection:text-black transition-colors duration-300">
-      {/* Background ambient glowing shapes */}
+    <div className="min-h-screen flex flex-col bg-[var(--bg-page)] text-[var(--text-primary)] relative selection:bg-[var(--primary-accent)] selection:text-[var(--btn-text-on-accent)] transition-colors duration-250">
+      {/* Background ambient lighting - subtle lime & charcoal */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-cyan-600/10 rounded-full blur-[140px]" />
-        <div className="absolute top-1/2 -right-40 w-96 h-96 bg-purple-600/10 rounded-full blur-[140px]" />
-        <div className="absolute -bottom-40 left-1/3 w-96 h-96 bg-pink-600/10 rounded-full blur-[140px]" />
+        <div className="absolute -top-32 -left-32 w-96 h-96 bg-[var(--primary-accent)] opacity-[0.05] rounded-full blur-[140px]" />
+        <div className="absolute top-1/2 -right-32 w-80 h-80 bg-[var(--primary-accent)] opacity-[0.03] rounded-full blur-[130px]" />
         {/* Subtle grid pattern overlay */}
         <div
-          className="absolute inset-0 opacity-[0.03]"
+          className="absolute inset-0 opacity-[0.025]"
           style={{
-            backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px)`,
-            backgroundSize: '24px 24px',
+            backgroundImage: `radial-gradient(currentColor 1px, transparent 1px)`,
+            backgroundSize: '28px 28px',
           }}
         />
       </div>
@@ -76,7 +75,7 @@ function GameApp() {
         )}
 
         {currentView === 'games' && (
-          <Home setCurrentView={handleNavigate} openAuthModal={openAuthModal} />
+          <Home setCurrentView={handleNavigate} openAuthModal={openAuthModal} initialSection="games" />
         )}
 
         {currentView === 'car-racing' && (

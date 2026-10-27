@@ -96,7 +96,7 @@ export const Puzzle = ({ setCurrentView }) => {
         soundEffects.playWin();
         triggerConfetti();
 
-        const totalTime = seconds + 1; // current second
+        const totalTime = seconds + 1;
         recordPuzzleResult({ size: gridSize, moves: moves + 1, timeSeconds: totalTime });
         addToast({
           title: `Puzzle Solved! 🧩`,
@@ -125,13 +125,10 @@ export const Puzzle = ({ setCurrentView }) => {
       if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') {
         if (blankRow < gridSize - 1) targetIndex = (blankRow + 1) * gridSize + blankCol;
       } else if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') {
-        // Tile ABOVE the blank slides DOWN
         if (blankRow > 0) targetIndex = (blankRow - 1) * gridSize + blankCol;
       } else if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') {
-        // Tile to the RIGHT of the blank slides LEFT
         if (blankCol < gridSize - 1) targetIndex = blankRow * gridSize + (blankCol + 1);
       } else if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') {
-        // Tile to the LEFT of the blank slides RIGHT
         if (blankCol > 0) targetIndex = blankRow * gridSize + (blankCol - 1);
       }
 
@@ -143,265 +140,244 @@ export const Puzzle = ({ setCurrentView }) => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [tiles, gridSize, isVictory, isRunning, seconds, moves]);
+  }, [tiles, gridSize, isVictory, moves, seconds, isRunning]);
 
-  // Hint engine
   const handleHint = () => {
-    if (isVictory) return;
-    const bestMoveIndex = getBestHintMove(tiles, gridSize);
-    if (bestMoveIndex !== null) {
-      setHighlightTile(bestMoveIndex);
-      soundEffects.playHint(true);
+    soundEffects.playHint(true);
+    const hint = getBestHintMove(tiles, gridSize);
+    if (hint !== null) {
+      setHighlightTile(hint);
       addToast({
-        title: '💡 Hint Provided!',
-        message: `Slide tile #${tiles[bestMoveIndex]} to reduce disorder.`,
+        title: 'Tactical Hint 💡',
+        message: `Slide the highlighted tile into the empty slot.`,
         type: 'info',
-        duration: 3000,
       });
     }
   };
 
-  // Format MM:SS
   const formatTime = (secs) => {
-    const m = String(Math.floor(secs / 60)).padStart(2, '0');
-    const s = String(secs % 60).padStart(2, '0');
-    return `${m}:${s}`;
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  const bestRecordKey = gridSize === 3 ? 'best3x3' : gridSize === 4 ? 'best4x4' : 'best5x5';
-  const bestRecord = stats.puzzle[bestRecordKey];
+  const bestKey = gridSize === 3 ? 'best3x3' : gridSize === 4 ? 'best4x4' : 'best5x5';
+  const bestRecord = stats.puzzle?.[bestKey];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-      {/* Top Header */}
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+      {/* Top Header & Grid Switcher */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <button
           onClick={() => {
             soundEffects.playClick();
             setCurrentView('home');
           }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-slate-300 hover:text-white glass-panel border border-white/10 hover:border-pink-500/40 transition-all self-start"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] surface-card hover:border-[var(--primary-accent-border)] transition-all self-start"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Games
         </button>
 
-        {/* Grid Size Switcher */}
-        <div className="flex items-center p-1 rounded-2xl bg-white/5 border border-white/10 self-start sm:self-auto">
-          {[3, 4, 5].map((size) => (
-            <button
-              key={size}
-              onClick={() => {
-                soundEffects.playClick();
-                setGridSize(size);
-              }}
-              className={`px-3.5 sm:px-4 py-1.5 text-xs font-bold rounded-xl transition-all ${
-                gridSize === size
-                  ? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              {size}×{size} {size === 3 ? '(Classic)' : size === 4 ? '(Master)' : '(Expert)'}
-            </button>
-          ))}
+        {/* Grid Dimensions Switcher: 3x3, 4x4, 5x5 */}
+        <div className="flex items-center p-1 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)] self-start sm:self-auto">
+          {[3, 4, 5].map((size) => {
+            const isSelected = gridSize === size;
+            return (
+              <button
+                key={size}
+                onClick={() => {
+                  soundEffects.playClick();
+                  setGridSize(size);
+                }}
+                className={`px-3.5 sm:px-4 py-1.5 text-xs font-semibold rounded-xl transition-all ${
+                  isSelected
+                    ? 'bg-[var(--primary-accent)] text-[var(--btn-text-on-accent)] font-bold'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                {size}×{size} {size === 3 ? 'Classic' : size === 4 ? 'Pro' : 'Expert'}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Puzzle Board Column */}
         <div className="lg:col-span-7 flex flex-col items-center">
-          <div className="w-full glass-panel rounded-3xl p-6 sm:p-8 border border-pink-500/30 shadow-2xl relative">
-            {/* Top Counters: Timer & Moves */}
-            <div className="grid grid-cols-2 gap-3 mb-6">
-              <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-pink-500/20 text-pink-400 flex items-center justify-center shrink-0">
-                  <Clock className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    Elapsed Time
-                  </p>
-                  <p className="font-['Orbitron'] text-xl font-bold text-white">
-                    {formatTime(seconds)}
-                  </p>
-                </div>
+          <div className="w-full surface-card rounded-3xl p-6 sm:p-8 relative">
+            {/* HUD Status Bar */}
+            <div className="flex items-center justify-between gap-3 mb-6">
+              {/* Timer */}
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)]">
+                <Clock className="w-3.5 h-3.5 text-[var(--primary-accent)]" />
+                <span className="font-mono-stats text-sm font-bold text-[var(--text-primary)]">
+                  {formatTime(seconds)}
+                </span>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0">
-                  <Footprints className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    Moves Count
-                  </p>
-                  <p className="font-['Orbitron'] text-xl font-bold text-white">
-                    {moves}
-                  </p>
-                </div>
+              {/* Moves Counter */}
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)]">
+                <Footprints className="w-3.5 h-3.5 text-[var(--primary-accent)]" />
+                <span className="font-mono-stats text-sm font-bold text-[var(--text-primary)]">
+                  {moves} <span className="font-sans text-[11px] text-[var(--text-secondary)] font-normal">moves</span>
+                </span>
+              </div>
+
+              {/* Best Record */}
+              <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl badge-lime text-xs">
+                <Trophy className="w-3.5 h-3.5" />
+                <span className="text-[11px] font-medium">Best:</span>
+                <span className="font-mono-stats font-bold">
+                  {bestRecord ? `${bestRecord.moves}m · ${formatTime(bestRecord.timeSeconds)}` : '—'}
+                </span>
               </div>
             </div>
 
-            {/* Sliding Tiles Grid */}
+            {/* Sliding Puzzle Dynamic Grid */}
             <div
-              className="relative aspect-square max-w-[340px] sm:max-w-[400px] mx-auto p-3 rounded-2xl bg-black/50 border border-white/10 shadow-inner grid gap-2.5"
+              className="relative aspect-square max-w-[340px] sm:max-w-[400px] mx-auto p-3 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)] grid gap-2.5 shadow-inner"
               style={{
                 gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
-                gridTemplateRows: `repeat(${gridSize}, minmax(0, 1fr))`,
               }}
             >
-              {tiles.map((tile, idx) => {
-                const isEmpty = tile === 0;
+              {tiles.map((num, idx) => {
+                const isBlank = num === 0;
                 const isHinted = highlightTile === idx;
-                const isCorrect = tile === idx + 1;
+                const isCorrectPosition = num === idx + 1;
 
-                if (isEmpty) {
+                if (isBlank) {
                   return (
                     <div
-                      key="empty-tile"
-                      className="rounded-2xl bg-slate-900/40 border border-dashed border-white/10 flex items-center justify-center"
-                    >
-                      <span className="text-slate-600 text-xs font-mono">SPACE</span>
-                    </div>
+                      key="blank"
+                      className="rounded-xl border border-dashed border-[var(--border-color)] bg-[var(--bg-card)]/30 flex items-center justify-center transition-all"
+                    />
                   );
                 }
 
                 return (
                   <motion.button
-                    key={tile}
+                    key={num}
                     layout
-                    transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                    transition={{ type: 'spring', damping: 22, stiffness: 300 }}
                     onClick={() => handleTileClick(idx)}
-                    className={`relative rounded-2xl flex items-center justify-center font-['Orbitron'] font-extrabold select-none shadow-md transition-all active:scale-95 ${
-                      gridSize === 5
-                        ? 'text-lg sm:text-xl'
-                        : gridSize === 4
-                        ? 'text-2xl sm:text-3xl'
-                        : 'text-3xl sm:text-4xl'
+                    className={`rounded-xl flex items-center justify-center font-mono-stats font-bold select-none transition-all duration-150 relative ${
+                      gridSize === 3 ? 'text-2xl sm:text-3xl' : gridSize === 4 ? 'text-xl sm:text-2xl' : 'text-base sm:text-lg'
                     } ${
                       isHinted
-                        ? 'bg-amber-400 text-black border-2 border-amber-300 shadow-lg shadow-amber-400/50 scale-105'
-                        : isCorrect
-                        ? 'bg-gradient-to-tr from-pink-600/70 to-rose-700/80 text-white border border-pink-400/40 hover:brightness-110'
-                        : 'bg-white/10 text-slate-200 border border-white/15 hover:bg-white/15'
+                        ? 'bg-[var(--primary-accent)] text-[var(--btn-text-on-accent)] ring-2 ring-[var(--primary-accent)] scale-105 shadow-md'
+                        : isCorrectPosition
+                        ? 'bg-[var(--primary-accent-subtle)] text-[var(--primary-accent)] border border-[var(--primary-accent-border)] hover:bg-[var(--primary-accent)] hover:text-[var(--btn-text-on-accent)]'
+                        : 'bg-[var(--bg-card)] text-[var(--text-primary)] border border-[var(--border-color)] hover:border-[var(--primary-accent-border)]'
                     }`}
                   >
-                    <span>{tile}</span>
-                    {isCorrect && (
-                      <span className="absolute bottom-1 right-1.5 w-1.5 h-1.5 rounded-full bg-pink-400"></span>
+                    <span>{num}</span>
+                    {isCorrectPosition && !isHinted && (
+                      <span className="absolute bottom-1 right-1.5 w-1.5 h-1.5 rounded-full bg-[var(--primary-accent)]" />
                     )}
                   </motion.button>
                 );
               })}
             </div>
 
-            {/* Victory Announcement Banner */}
-            <AnimatePresence>
-              {isVictory && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="mt-6 p-5 rounded-2xl bg-gradient-to-r from-pink-500/20 via-rose-500/20 to-purple-500/20 border border-pink-500/40 text-center"
-                >
-                  <Sparkles className="w-8 h-8 text-pink-400 mx-auto mb-2 animate-spin" />
-                  <h3 className="font-['Orbitron'] font-bold text-2xl text-white">
-                    Puzzle Master! 🏆
-                  </h3>
-                  <p className="text-xs text-slate-300 mt-1">
-                    Completed in <strong>{formatTime(seconds)}</strong> using <strong>{moves} moves</strong>!
-                  </p>
-                  <p className="text-[11px] text-pink-300 mt-2 font-semibold">
-                    New record saved to your local profile!
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Victory Card */}
+            {isVictory && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="mt-6 p-5 rounded-2xl bg-[var(--primary-accent-subtle)] border border-[var(--primary-accent-border)] text-center space-y-2"
+              >
+                <div className="inline-flex p-2 rounded-xl bg-[var(--primary-accent)] text-[var(--btn-text-on-accent)] mb-1">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
+                <h4 className="font-heading text-xl font-bold text-[var(--text-primary)]">
+                  Puzzle Solved!
+                </h4>
+                <p className="font-mono-stats text-sm text-[var(--primary-accent)] font-semibold">
+                  {moves} Moves • {formatTime(seconds)} Elapsed
+                </p>
+                <div className="pt-2">
+                  <button
+                    onClick={() => initPuzzle(gridSize)}
+                    className="px-6 py-2.5 rounded-xl btn-primary text-xs font-bold inline-flex items-center gap-2"
+                  >
+                    <Shuffle className="w-3.5 h-3.5" />
+                    <span>Shuffle New Game</span>
+                  </button>
+                </div>
+              </motion.div>
+            )}
 
-            {/* Controls Bar */}
-            <div className="grid grid-cols-3 gap-2.5 mt-6">
+            {/* Bottom Controls */}
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[var(--border-color)]">
               <button
                 onClick={() => initPuzzle(gridSize)}
-                className="py-3 px-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs flex items-center justify-center gap-1.5 border border-white/10 transition-all active:scale-95"
+                className="px-4 py-2 rounded-xl btn-secondary text-xs font-semibold flex items-center gap-1.5 focus:outline-none"
               >
-                <Shuffle className="w-4 h-4 text-pink-400" />
-                Shuffle
+                <Shuffle className="w-3.5 h-3.5 text-[var(--primary-accent)]" />
+                <span>Shuffle</span>
               </button>
 
               <button
                 onClick={handleHint}
                 disabled={isVictory}
-                className="py-3 px-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 font-bold text-xs flex items-center justify-center gap-1.5 border border-amber-500/30 transition-all active:scale-95 disabled:opacity-40"
+                className="px-4 py-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-elevated)] text-xs text-[var(--text-primary)] hover:border-[var(--primary-accent-border)] hover:text-[var(--primary-accent)] transition-all flex items-center gap-1.5"
               >
-                <Lightbulb className="w-4 h-4 text-amber-400" />
-                Hint
+                <Lightbulb className="w-3.5 h-3.5 text-[var(--primary-accent)]" />
+                <span>Show Hint</span>
               </button>
 
               <button
-                onClick={() => initPuzzle(gridSize)}
-                className="py-3 px-3 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 font-bold text-xs flex items-center justify-center gap-1.5 border border-pink-500/30 transition-all active:scale-95"
+                onClick={() => {
+                  soundEffects.playClick();
+                  initPuzzle(gridSize);
+                }}
+                className="px-3.5 py-2 rounded-xl border border-[var(--border-color)] text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center gap-1.5"
               >
-                <RotateCcw className="w-4 h-4 text-pink-400" />
-                Restart
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reset</span>
               </button>
             </div>
           </div>
         </div>
 
-        {/* Records & Keyboard Shortcuts Column */}
+        {/* Info Column */}
         <div className="lg:col-span-5 space-y-6">
-          {/* Best Record Card */}
-          <div className="glass-panel rounded-3xl p-6 border border-white/10 shadow-xl">
-            <h3 className="font-['Orbitron'] font-bold text-sm text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-              <Trophy className="w-4 h-4 text-pink-400" />
-              Best Record ({gridSize}×{gridSize})
-            </h3>
+          <div className="surface-card rounded-3xl p-6 sm:p-7 border border-[var(--border-color)] space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-[var(--border-color)]">
+              <h3 className="font-heading font-bold text-lg text-[var(--text-primary)] flex items-center gap-2">
+                <Keyboard className="w-4 h-4 text-[var(--primary-accent)]" />
+                Controls &amp; Solvability
+              </h3>
+              <span className="badge-lime text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
+                100% Solvable
+              </span>
+            </div>
 
-            {bestRecord ? (
-              <div className="grid grid-cols-2 gap-3 text-center">
-                <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-                  <span className="text-[10px] text-slate-400 block uppercase font-bold">
-                    Fastest Time
-                  </span>
-                  <span className="font-['Orbitron'] text-xl font-bold text-pink-400 mt-1 block">
-                    {formatTime(bestRecord.timeSeconds)}
-                  </span>
-                </div>
-                <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-                  <span className="text-[10px] text-slate-400 block uppercase font-bold">
-                    Fewest Moves
-                  </span>
-                  <span className="font-['Orbitron'] text-xl font-bold text-white mt-1 block">
-                    {bestRecord.moves}
-                  </span>
-                </div>
+            <div className="space-y-4 text-xs text-[var(--text-secondary)]">
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)] flex items-center justify-between">
+                <span>Keyboard Slide:</span>
+                <span className="font-mono-stats font-bold text-[var(--text-primary)]">
+                  Arrow Keys / WASD
+                </span>
               </div>
-            ) : (
-              <div className="text-center py-6 px-3 rounded-2xl bg-white/5 border border-dashed border-white/10">
-                <p className="text-xs text-slate-400">No completion on {gridSize}x{gridSize} yet.</p>
-                <p className="text-[11px] text-slate-500 mt-1">Complete your first game to set a record!</p>
-              </div>
-            )}
-          </div>
 
-          {/* Keyboard Controls Info */}
-          <div className="glass-panel rounded-3xl p-6 border border-white/10">
-            <h4 className="font-['Orbitron'] text-xs font-bold text-pink-300 uppercase tracking-widest mb-3 flex items-center gap-2">
-              <Keyboard className="w-4 h-4 text-pink-400" />
-              Keyboard Navigation Controls
-            </h4>
-            <div className="space-y-2 text-xs text-slate-300">
-              <div className="flex items-center justify-between p-2 rounded-lg bg-white/5">
-                <span>Arrow Keys</span>
-                <span className="font-mono text-pink-300">↑ ↓ ← →</span>
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)] flex items-center justify-between">
+                <span>Click / Tap:</span>
+                <span className="font-mono-stats font-bold text-[var(--text-primary)]">
+                  Any Adjacent Tile
+                </span>
               </div>
-              <div className="flex items-center justify-between p-2 rounded-lg bg-white/5">
-                <span>WASD Keys</span>
-                <span className="font-mono text-pink-300">W A S D</span>
+
+              <div className="p-4 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)] space-y-2">
+                <span className="font-heading font-bold text-sm text-[var(--primary-accent)] block">
+                  How To Solve
+                </span>
+                <p className="leading-relaxed">
+                  Arrange tiles in numerical order from left to right, top to bottom. Green dots indicate a tile currently sitting in its correct final spot!
+                </p>
               </div>
-              <p className="text-[11px] text-slate-400 pt-1 leading-relaxed">
-                Pressing an arrow moves adjacent tiles directly into the vacant space!
-              </p>
             </div>
           </div>
         </div>

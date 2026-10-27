@@ -6,20 +6,34 @@ const ThemeContext = createContext(null);
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('gamezone_theme');
-      if (saved) return saved;
+      try {
+        const saved = localStorage.getItem('gamezone_theme');
+        if (saved === 'dark' || saved === 'light') return saved;
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+          return 'light';
+        }
+      } catch {
+        // fallback
+      }
     }
     return 'dark'; // default theme
   });
 
   useEffect(() => {
     const root = document.documentElement;
+    const body = document.body;
     if (theme === 'light') {
       root.classList.add('light');
       root.classList.remove('dark');
+      body.classList.add('light');
+      body.classList.remove('dark');
+      root.setAttribute('data-theme', 'light');
     } else {
       root.classList.add('dark');
       root.classList.remove('light');
+      body.classList.add('dark');
+      body.classList.remove('light');
+      root.setAttribute('data-theme', 'dark');
     }
     try {
       localStorage.setItem('gamezone_theme', theme);
