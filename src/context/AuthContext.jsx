@@ -43,6 +43,10 @@ export const AuthProvider = ({ children }) => {
     const trimmedUser = username.trim().toLowerCase();
     const trimmedEmail = email?.trim().toLowerCase() || '';
 
+    if (!trimmedEmail) {
+      return { success: false, message: 'Email address is required.' };
+    }
+
     // Try MongoDB backend
     try {
       const apiRes = await api.register({

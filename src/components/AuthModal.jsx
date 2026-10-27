@@ -1,6 +1,20 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Lock, Mail, User, LogIn, UserPlus, Gamepad2, AlertCircle, Camera } from 'lucide-react';
+import {
+  X,
+  Lock,
+  Mail,
+  User,
+  LogIn,
+  UserPlus,
+  Gamepad2,
+  AlertCircle,
+  Camera,
+  Eye,
+  EyeOff,
+  CheckCircle2,
+  ShieldCheck,
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { soundEffects } from '../audio/soundEffects';
@@ -11,6 +25,10 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signup' }) => {
 
   const [activeTab, setActiveTab] = useState(initialTab); // 'signin' | 'signup'
   const [errorMsg, setErrorMsg] = useState('');
+
+  // Password visibility states (controls whether dots or text is shown)
+  const [showSignInPassword, setShowSignInPassword] = useState(false);
+  const [showSignUpPassword, setShowSignUpPassword] = useState(false);
 
   // Sign In form
   const [signInData, setSignInData] = useState({ identifier: '', password: '' });
@@ -26,6 +44,28 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signup' }) => {
   });
 
   if (!isOpen) return null;
+
+  // Live password strength calculation
+  const getPasswordStrength = (pwd) => {
+    if (!pwd) return { score: 0, label: 'None', color: 'transparent', percent: 0 };
+    let score = 0;
+    if (pwd.length >= 8) score += 1;
+    if (pwd.length >= 10) score += 0.5;
+    if (/[a-z]/.test(pwd) && /[A-Z]/.test(pwd)) score += 1;
+    else if (/[a-zA-Z]/.test(pwd)) score += 0.5;
+    if (/[0-9]/.test(pwd)) score += 1;
+    if (/[^a-zA-Z0-9]/.test(pwd)) score += 0.5;
+
+    if (score < 2) return { score: 1, label: 'Weak', color: '#E53E3E', percent: 25 };
+    if (score < 3) return { score: 2, label: 'Fair', color: '#DD6B20', percent: 50 };
+    if (score < 3.5) return { score: 3, label: 'Good', color: '#84CC16', percent: 75 };
+    return { score: 4, label: 'Strong', color: 'var(--primary-accent)', percent: 100 };
+  };
+
+  const strength = getPasswordStrength(signUpData.password);
+  const hasMinLength = signUpData.password.length >= 8;
+  const hasLetters = /[a-zA-Z]/.test(signUpData.password);
+  const hasNumbers = /[0-9]/.test(signUpData.password);
 
   const handlePhotoUpload = (e) => {
     const file = e.target.files?.[0];
@@ -65,20 +105,41 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signup' }) => {
     e.preventDefault();
     setErrorMsg('');
 
-    if (!signUpData.username || !signUpData.password) {
-      setErrorMsg('Username and password are required.');
+    if (!signUpData.username.trim()) {
+      setErrorMsg('Username is required.');
       soundEffects.playHint(false);
       return;
     }
 
-    if (signUpData.username.length < 3) {
+    if (signUpData.username.trim().length < 3) {
       setErrorMsg('Username must be at least 3 characters.');
       soundEffects.playHint(false);
       return;
     }
 
-    if (signUpData.password.length < 4) {
-      setErrorMsg('Password must be at least 4 characters.');
+    // Email is strictly NOT optional
+    if (!signUpData.email.trim()) {
+      setErrorMsg('Email address is required.');
+      soundEffects.playHint(false);
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(signUpData.email.trim())) {
+      setErrorMsg('Please enter a valid email address (e.g. name@example.com).');
+      soundEffects.playHint(false);
+      return;
+    }
+
+    // Strong Password Validation
+    if (!hasMinLength) {
+      setErrorMsg('Strong password required: Minimum 8 characters.');
+      soundEffects.playHint(false);
+      return;
+    }
+
+    if (!hasLetters || !hasNumbers) {
+      setErrorMsg('Strong password required: Must contain both letters and numbers.');
       soundEffects.playHint(false);
       return;
     }
@@ -201,12 +262,33 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signup' }) => {
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
                 <input
-                  type="password"
+                  type={showSignInPassword ? 'text' : 'password'}
                   placeholder="••••••••"
                   value={signInData.password}
                   onChange={(e) => setSignInData({ ...signInData, password: e.target.value })}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] text-sm focus:outline-none focus:border-[var(--primary-accent)] transition-colors"
+                  className="w-full pl-10 pr-11 py-2.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] text-sm focus:outline-none focus:border-[var(--primary-accent)] transition-colors"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowSignInPassword(!showSignInPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-0.5"
+                  title={showSignInPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showSignInPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+
+              {/* Show Password Checkbox */}
+              <div className="mt-2 flex items-center justify-between">
+                <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={showSignInPassword}
+                    onChange={(e) => setShowSignInPassword(e.target.checked)}
+                    className="w-3.5 h-3.5 rounded border-[var(--border-color)] accent-[var(--primary-accent)] cursor-pointer"
+                  />
+                  <span>Show password</span>
+                </label>
               </div>
             </div>
 
@@ -309,29 +391,110 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'signup' }) => {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
-                Email (Optional)
+              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1 flex items-center justify-between">
+                <span>Email Address *</span>
+                <span className="text-[10px] text-[var(--primary-accent)] font-semibold">Required</span>
               </label>
-              <input
-                type="email"
-                placeholder="player@example.com"
-                value={signUpData.email}
-                onChange={(e) => setSignUpData({ ...signUpData, email: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] text-xs focus:outline-none focus:border-[var(--primary-accent)]"
-              />
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--text-secondary)]" />
+                <input
+                  type="email"
+                  required
+                  placeholder="player@example.com"
+                  value={signUpData.email}
+                  onChange={(e) => setSignUpData({ ...signUpData, email: e.target.value })}
+                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] text-xs focus:outline-none focus:border-[var(--primary-accent)]"
+                />
+              </div>
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
-                Password *
-              </label>
-              <input
-                type="password"
-                placeholder="At least 4 characters"
-                value={signUpData.password}
-                onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] text-xs focus:outline-none focus:border-[var(--primary-accent)]"
-              />
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-medium text-[var(--text-secondary)]">
+                  Password *
+                </label>
+                {signUpData.password && (
+                  <span
+                    className="text-[10px] font-mono-stats font-bold"
+                    style={{ color: strength.color }}
+                  >
+                    Strength: {strength.label}
+                  </span>
+                )}
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--text-secondary)]" />
+                <input
+                  type={showSignUpPassword ? 'text' : 'password'}
+                  placeholder="Min. 8 characters with letters & numbers"
+                  value={signUpData.password}
+                  onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
+                  className="w-full pl-9 pr-10 py-2 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] text-xs focus:outline-none focus:border-[var(--primary-accent)]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowSignUpPassword(!showSignUpPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-0.5"
+                  title={showSignUpPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showSignUpPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+
+              {/* Show Password Checkbox */}
+              <div className="mt-1.5 flex items-center justify-between">
+                <label className="flex items-center gap-2 cursor-pointer select-none text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={showSignUpPassword}
+                    onChange={(e) => setShowSignUpPassword(e.target.checked)}
+                    className="w-3.5 h-3.5 rounded border-[var(--border-color)] accent-[var(--primary-accent)] cursor-pointer"
+                  />
+                  <span>Show password</span>
+                </label>
+              </div>
+
+              {/* Live Password Strength Meter */}
+              {signUpData.password && (
+                <div className="mt-2 space-y-1.5">
+                  <div className="w-full h-1.5 rounded-full bg-[var(--bg-elevated)] border border-[var(--border-color)] overflow-hidden flex gap-1 p-0.5">
+                    {[1, 2, 3, 4].map((seg) => (
+                      <div
+                        key={seg}
+                        className="h-full flex-1 rounded-full transition-all duration-300"
+                        style={{
+                          backgroundColor:
+                            strength.score >= seg ? strength.color : 'transparent',
+                        }}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Requirements checklist */}
+                  <div className="flex flex-wrap items-center gap-2 text-[10px] font-sans">
+                    <span
+                      className={`inline-flex items-center gap-1 ${
+                        hasMinLength
+                          ? 'text-[var(--primary-accent)] font-semibold'
+                          : 'text-[var(--text-secondary)]'
+                      }`}
+                    >
+                      <CheckCircle2 className="w-3 h-3" />
+                      8+ characters
+                    </span>
+                    <span
+                      className={`inline-flex items-center gap-1 ${
+                        hasLetters && hasNumbers
+                          ? 'text-[var(--primary-accent)] font-semibold'
+                          : 'text-[var(--text-secondary)]'
+                      }`}
+                    >
+                      <CheckCircle2 className="w-3 h-3" />
+                      Letters &amp; numbers
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
 
             <button

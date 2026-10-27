@@ -178,8 +178,24 @@ app.post('/api/auth/register', async (req, res) => {
   try {
     const { name, username, email, password, avatar, photo, role } = req.body;
 
-    if (!username || !password) {
-      return res.status(400).json({ success: false, message: 'Username and password are required' });
+    if (!username || !email || !password) {
+      return res.status(400).json({ success: false, message: 'Username, email, and password are all required' });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(cleanEmail)) {
+      return res.status(400).json({ success: false, message: 'Please provide a valid email address (e.g. name@example.com)' });
+    }
+
+    // Strong password validation: at least 8 chars, with both letters and numbers
+    if (password.length < 8) {
+      return res.status(400).json({ success: false, message: 'Password must be at least 8 characters long' });
+    }
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    if (!hasLetter || !hasNumber) {
+      return res.status(400).json({ success: false, message: 'Password must contain both letters and numbers' });
     }
 
     if (mongoose.connection.readyState !== 1) {
@@ -195,13 +211,18 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Username is already taken' });
     }
 
+    const existingEmail = await User.findOne({ email: cleanEmail });
+    if (existingEmail) {
+      return res.status(400).json({ success: false, message: 'Email address is already in use by another player' });
+    }
+
     // Auto-grant admin role if username is 'admin' or explicitly designated
     const userRole = role === 'admin' || cleanUsername === 'admin' ? 'admin' : 'player';
 
     const newUser = await User.create({
       name: name?.trim() || username.trim(),
       username: cleanUsername,
-      email: email?.trim().toLowerCase() || '',
+      email: cleanEmail,
       password,
       avatar: avatar || '🎮',
       photo: photo || '',
