@@ -8,6 +8,7 @@ import { NumberGuessing } from './pages/NumberGuessing';
 import { TicTacToe } from './pages/TicTacToe';
 import { Puzzle } from './pages/Puzzle';
 import { CarRacing } from './pages/CarRacing';
+import { GalaxyStrike } from './pages/GalaxyStrike';
 import { Leaderboard } from './pages/Leaderboard';
 import { Achievements } from './pages/Achievements';
 import { About } from './pages/About';
@@ -23,6 +24,7 @@ function GameApp() {
   const [currentView, setCurrentView] = useState('home');
   const [authModalState, setAuthModalState] = useState({ isOpen: false, tab: 'signup' });
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [onlineRoomCode, setOnlineRoomCode] = useState('');
 
   const { currentUser } = useAuth();
   const { addToast } = useToast();
@@ -43,7 +45,33 @@ function GameApp() {
     setProfileModalOpen(false);
   };
 
-  const GAME_VIEWS = ['guess-game', 'tic-tac-toe', 'puzzle-game', 'car-racing'];
+  const GAME_VIEWS = ['guess-game', 'tic-tac-toe', 'puzzle-game', 'car-racing', 'galaxy-strike'];
+
+  // Check URL query parameters for invite links (?room=GZ-XXXX or ?join=GZ-XXXX)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const roomParam = params.get('room') || params.get('join');
+    if (roomParam) {
+      const cleanCode = roomParam.trim().toUpperCase();
+      setOnlineRoomCode(cleanCode);
+      if (currentUser.isGuest) {
+        addToast({
+          title: 'Multiplayer Match Invite! 🎮',
+          message: `Create an account to join Room ${cleanCode} with your friend!`,
+          type: 'info',
+        });
+        openAuthModal('signup');
+      } else {
+        setCurrentView('tic-tac-toe');
+        addToast({
+          title: `Room ${cleanCode} Detected`,
+          message: 'Connecting to 2-player match arena...',
+          type: 'success',
+        });
+      }
+    }
+  }, [currentUser.isGuest]);
 
   // Intercept navigation: Require signup to play any game
   const handleNavigate = (viewId) => {
@@ -112,11 +140,19 @@ function GameApp() {
         )}
 
         {currentView === 'tic-tac-toe' && (
-          <TicTacToe setCurrentView={handleNavigate} openAuthModal={openAuthModal} />
+          <TicTacToe
+            setCurrentView={handleNavigate}
+            openAuthModal={openAuthModal}
+            initialRoomCode={onlineRoomCode}
+          />
         )}
 
         {currentView === 'puzzle-game' && (
           <Puzzle setCurrentView={handleNavigate} openAuthModal={openAuthModal} />
+        )}
+
+        {currentView === 'galaxy-strike' && (
+          <GalaxyStrike setCurrentView={handleNavigate} openAuthModal={openAuthModal} />
         )}
 
         {currentView === 'leaderboard' && (

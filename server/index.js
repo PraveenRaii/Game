@@ -73,6 +73,18 @@ const DEFAULT_GAMES = [
     category: 'Arcade',
     active: true,
   },
+  {
+    gameId: 'galaxy-strike',
+    title: 'Galaxy Strike',
+    tagline: 'Solo & Team Co-Op Combat',
+    description: 'Engage enemy starfleets solo or assemble a 2-Player Squadron with shared laser fire, revives, and EMP blasts.',
+    difficulty: 'Solo Mission • Team Co-Op',
+    badges: ['2-Player Co-Op', 'Team Revive', 'Wave Combat'],
+    accentColor: 'lime',
+    icon: 'Rocket',
+    category: 'Action',
+    active: true,
+  },
 ];
 
 // Seed initial admin & games if needed
@@ -443,6 +455,251 @@ app.delete('/api/scores/:id', async (req, res) => {
     const deleted = await Score.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ success: false, message: 'Score not found' });
     res.json({ success: true, message: 'Score removed' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/* ========================================================
+   2-DEVICE MULTIPLAYER ROOMS (REAL-TIME CODE & SHARE LINK)
+======================================================== */
+
+const multiplayerRooms = new Map();
+
+// Helper: 3x3 Winner check
+const MULTIPLAYER_WINNING_COMBOS = [
+  [0, 1, 2], [3, 4, 5], [6, 7, 8],
+  [0, 3, 6], [1, 4, 7], [2, 5, 8],
+  [0, 4, 8], [2, 4, 6],
+];
+
+function checkRoomWinner(board) {
+  for (const combo of MULTIPLAYER_WINNING_COMBOS) {
+    const [a, b, c] = combo;
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+      return { winner: board[a], line: combo };
+    }
+  }
+  if (board.every((cell) => cell !== null)) {
+    return { winner: 'draw', line: null };
+  }
+  return null;
+}
+
+// Generate human-friendly 6-char Room Code (e.g. GZ-4892)
+function generateRoomCode() {
+  const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+  let code = 'GZ-';
+  for (let i = 0; i < 4; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}
+
+// Periodic cleanup of inactive rooms (older than 2 hours)
+setInterval(() => {
+  const now = Date.now();
+  for (const [code, room] of multiplayerRooms.entries()) {
+    if (now - (room.lastActivity || 0) > 2 * 60 * 60 * 1000) {
+      multiplayerRooms.delete(code);
+    }
+  }
+}, 30 * 60 * 1000);
+
+// 1. Create Room (Host)
+app.post('/api/rooms/create', (req, res) => {
+  try {
+    const { game = 'tic-tac-toe', host } = req.body;
+    if (!host || !host.name) {
+      return res.status(400).json({ success: false, message: 'Host player information is required' });
+    }
+
+    const code = generateRoomCode();
+    const room = {
+      code,
+      game,
+      host: {
+        id: host.id || 'p1_' + Date.now(),
+        name: host.name,
+        username: host.username || host.name,
+        avatar: host.avatar || '🎮',
+        photo: host.photo || '',
+      },
+      guest: null,
+      status: 'waiting', // 'waiting' | 'playing' | 'finished'
+      board: Array(9).fill(null),
+      currentTurn: 'X', // Host is always 'X'
+      winner: null,
+      winningLine: null,
+      scores: { host: 0, guest: 0, draws: 0 },
+      lastActivity: Date.now(),
+    };
+
+    multiplayerRooms.set(code, room);
+    res.status(201).json({ success: true, room });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// 2. Join Room (Guest)
+app.post('/api/rooms/join', (req, res) => {
+  try {
+    const { code, guest } = req.body;
+    if (!code || !guest || !guest.name) {
+      return res.status(400).json({ success: false, message: 'Room code and player profile are required' });
+    }
+
+    const cleanCode = code.trim().toUpperCase();
+    const room = multiplayerRooms.get(cleanCode);
+    if (!room) {
+      return res.status(404).json({ success: false, message: `Room ${cleanCode} not found. Please verify code.` });
+    }
+
+    // Reconnecting as Host
+    const isSameAsHost =
+      room.host.id === guest.id ||
+      (room.host.username && room.host.username === guest.username);
+
+    if (isSameAsHost) {
+      room.lastActivity = Date.now();
+      return res.json({ success: true, room, role: 'host' });
+    }
+
+    // If room already has guest, check if reconnecting
+    if (room.guest) {
+      const isSameAsGuest =
+        room.guest.id === guest.id ||
+        (room.guest.username && room.guest.username === guest.username);
+
+      if (isSameAsGuest) {
+        room.lastActivity = Date.now();
+        return res.json({ success: true, room, role: 'guest' });
+      }
+
+      return res.status(400).json({
+        success: false,
+        message: `Room ${cleanCode} already has 2 active players.`,
+      });
+    }
+
+    // First time guest joins
+    room.guest = {
+      id: guest.id || 'p2_' + Date.now(),
+      name: guest.name,
+      username: guest.username || guest.name,
+      avatar: guest.avatar || '⚡',
+      photo: guest.photo || '',
+    };
+    room.status = 'playing';
+    room.lastActivity = Date.now();
+
+    res.json({ success: true, room, role: 'guest' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// 3. Get Room Live State (Polling)
+app.get('/api/rooms/:code', (req, res) => {
+  try {
+    const cleanCode = req.params.code.trim().toUpperCase();
+    const room = multiplayerRooms.get(cleanCode);
+    if (!room) {
+      return res.status(404).json({ success: false, message: 'Room not found or expired.' });
+    }
+    room.lastActivity = Date.now();
+    res.json({ success: true, room });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// 4. Make Move in Room
+app.post('/api/rooms/:code/move', (req, res) => {
+  try {
+    const cleanCode = req.params.code.trim().toUpperCase();
+    const room = multiplayerRooms.get(cleanCode);
+    if (!room) {
+      return res.status(404).json({ success: false, message: 'Room not found.' });
+    }
+
+    const { playerId, cellIndex, symbol } = req.body;
+
+    if (room.status !== 'playing') {
+      return res.status(400).json({ success: false, message: 'Game is waiting for opponent to join.' });
+    }
+
+    if (room.winner) {
+      return res.status(400).json({ success: false, message: 'Game is already completed.' });
+    }
+
+    if (cellIndex < 0 || cellIndex > 8 || room.board[cellIndex] !== null) {
+      return res.status(400).json({ success: false, message: 'Invalid or occupied cell.' });
+    }
+
+    if (symbol !== room.currentTurn) {
+      return res.status(400).json({ success: false, message: `It is player ${room.currentTurn}'s turn.` });
+    }
+
+    // Place move
+    room.board[cellIndex] = symbol;
+
+    const result = checkRoomWinner(room.board);
+    if (result) {
+      room.winner = result.winner;
+      room.winningLine = result.line;
+      if (result.winner === 'X') room.scores.host += 1;
+      else if (result.winner === 'O') room.scores.guest += 1;
+      else if (result.winner === 'draw') room.scores.draws += 1;
+    } else {
+      room.currentTurn = room.currentTurn === 'X' ? 'O' : 'X';
+    }
+
+    room.lastActivity = Date.now();
+    res.json({ success: true, room });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// 5. Rematch / Reset Board
+app.post('/api/rooms/:code/rematch', (req, res) => {
+  try {
+    const cleanCode = req.params.code.trim().toUpperCase();
+    const room = multiplayerRooms.get(cleanCode);
+    if (!room) {
+      return res.status(404).json({ success: false, message: 'Room not found.' });
+    }
+
+    room.board = Array(9).fill(null);
+    room.currentTurn = 'X';
+    room.winner = null;
+    room.winningLine = null;
+    room.status = room.guest ? 'playing' : 'waiting';
+    room.lastActivity = Date.now();
+
+    res.json({ success: true, room });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// 6. Leave Room
+app.post('/api/rooms/:code/leave', (req, res) => {
+  try {
+    const cleanCode = req.params.code.trim().toUpperCase();
+    const room = multiplayerRooms.get(cleanCode);
+    if (room) {
+      const { playerId } = req.body;
+      if (room.host.id === playerId || room.host.username === playerId) {
+        multiplayerRooms.delete(cleanCode);
+      } else if (room.guest && (room.guest.id === playerId || room.guest.username === playerId)) {
+        room.guest = null;
+        room.status = 'waiting';
+      }
+    }
+    res.json({ success: true, message: 'Left room successfully.' });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

@@ -18,6 +18,7 @@ import {
   X,
   Sparkles,
   Lock,
+  Rocket,
 } from 'lucide-react';
 import { GameCard } from '../components/GameCard';
 import { ScoreCard } from '../components/ScoreCard';
@@ -25,16 +26,19 @@ import { BrandLogo } from '../components/BrandLogo';
 import { soundEffects } from '../audio/soundEffects';
 import { useGameStats } from '../context/GameStatsContext';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 export const Home = ({ setCurrentView, openAuthModal, initialSection }) => {
   const { stats } = useGameStats();
   const { currentUser } = useAuth();
+  const { addToast } = useToast();
   const [howToPlayOpen, setHowToPlayOpen] = useState(false);
 
   // Difficulty selections stored for cards preview
   const [guessDifficulty, setGuessDifficulty] = useState('medium');
   const [puzzleDifficulty, setPuzzleDifficulty] = useState('3x3');
   const [carDifficulty, setCarDifficulty] = useState('medium');
+  const [galaxyMode, setGalaxyMode] = useState('team');
 
   const scrollToGames = () => {
     soundEffects.playClick();
@@ -222,8 +226,8 @@ export const Home = ({ setCurrentView, openAuthModal, initialSection }) => {
           </div>
         )}
 
-        {/* 4 Cards Grid (3 Core + Car Racing) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* 5 Cards Grid (Core Games + Car Racing + Galaxy Strike) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Card 1: Number Guessing */}
           <GameCard
             id="guess-game"
@@ -254,20 +258,21 @@ export const Home = ({ setCurrentView, openAuthModal, initialSection }) => {
           <GameCard
             id="tic-tac-toe"
             title="Tic-Tac-Toe"
-            tagline="Classic Tactics"
-            description="Play against Minimax unbeatable AI or duel a friend locally in a monochrome grid."
+            tagline="1v1 Online &amp; AI Tactics"
+            description="Battle friends live across 2 devices using Room Codes / Share Links, or challenge Minimax AI."
             illustrationType="tic-tac-toe"
             icon={Grid3X3}
             difficultyOptions={[
-              { label: 'vs Computer', value: 'ai' },
-              { label: '2 Players', value: 'pvp' },
+              { label: 'vs AI', value: 'ai' },
+              { label: 'Local 2P', value: 'pvp' },
+              { label: '🌐 Online Room', value: 'online' },
             ]}
-            activeDifficulty="ai"
+            activeDifficulty="online"
             statsBadge={{
               label: 'Wins / Draws',
               value: `${stats.ticTacToe?.aiWins || 0}W · ${stats.ticTacToe?.draws || 0}D`,
             }}
-            ctaText={currentUser?.isGuest ? 'Sign Up to Play' : 'Challenge Now'}
+            ctaText={currentUser?.isGuest ? 'Sign Up to Play' : 'Play 2-Device / AI'}
             isLocked={currentUser?.isGuest}
             onPlay={handleLaunchGame}
           />
@@ -320,6 +325,31 @@ export const Home = ({ setCurrentView, openAuthModal, initialSection }) => {
                 : '1,200m target',
             }}
             ctaText={currentUser?.isGuest ? 'Sign Up to Play' : 'Race Now'}
+            isLocked={currentUser?.isGuest}
+            onPlay={handleLaunchGame}
+          />
+
+          {/* Card 5: Galaxy Strike (Team & Solo) */}
+          <GameCard
+            id="galaxy-strike"
+            title="Galaxy Strike"
+            tagline="Solo &amp; Team Co-Op"
+            description="Defend the sector solo or team up in 2-Player Squadron Co-Op with shared revives and EMP firepower."
+            illustrationType="galaxy-strike"
+            icon={Rocket}
+            difficultyOptions={[
+              { label: '🚀 Solo Mission', value: 'solo' },
+              { label: '👥 Team Co-Op (2P)', value: 'team' },
+            ]}
+            activeDifficulty={galaxyMode}
+            onSelectDifficulty={setGalaxyMode}
+            statsBadge={{
+              label: 'Squadron Best',
+              value: stats.galaxyStrike?.highScoreSolo || stats.galaxyStrike?.highScoreTeam
+                ? `${Math.max(stats.galaxyStrike?.highScoreSolo || 0, stats.galaxyStrike?.highScoreTeam || 0).toLocaleString()} pts`
+                : 'Wave 10 Goal',
+            }}
+            ctaText={currentUser?.isGuest ? 'Sign Up to Play' : 'Play Solo / Team'}
             isLocked={currentUser?.isGuest}
             onPlay={handleLaunchGame}
           />
@@ -399,6 +429,17 @@ export const Home = ({ setCurrentView, openAuthModal, initialSection }) => {
                   <p className="text-[var(--text-secondary)] leading-relaxed">
                     Use Left / Right arrow keys or A/D to switch between 3 highway lanes. Avoid oncoming traffic vehicles.
                     Press Spacebar or Up Arrow to engage Nitro Boost. Collect coins for bonus multipliers and shields for invulnerability.
+                  </p>
+                </div>
+
+                {/* Galaxy Strike (Solo & Team) */}
+                <div className="p-4 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)] space-y-1.5">
+                  <h4 className="font-heading font-bold text-base text-[var(--primary-accent)] flex items-center gap-2">
+                    <Rocket className="w-4 h-4" />
+                    Galaxy Strike (Solo &amp; Team Co-Op)
+                  </h4>
+                  <p className="text-[var(--text-secondary)] leading-relaxed">
+                    Battle waves of alien armadas! In <strong>Solo Mission</strong>, fly Lime Striker using Arrows/WASD and Space to blast hostiles. In <strong>Team Co-Op (2-Player Squadron)</strong>, Pilot 1 uses Arrows + Space and Pilot 2 uses WASD + F/Enter. Pick up Triple Lasers (3X), Shields (SH), EMP Blasts, and Team Revive capsules (+HP) to keep both pilots alive!
                   </p>
                 </div>
               </div>

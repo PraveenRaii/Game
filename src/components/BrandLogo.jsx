@@ -124,20 +124,23 @@ export const BrandLogo = () => {
         </div>
       </motion.div>
 
-      {/* Bottom Row: 4 Game Identity Badges */}
+      {/* Bottom Row: 5 Game Identity Badges */}
       <div className="w-full pt-3 border-t border-[var(--border-color)]">
-        <div className="grid grid-cols-4 gap-1.5 text-center">
-          <div className="py-1 px-1 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[10px] font-mono-stats font-semibold text-[var(--text-secondary)]">
+        <div className="grid grid-cols-5 gap-1 text-center">
+          <div className="py-1 px-0.5 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[9px] font-mono-stats font-semibold text-[var(--text-secondary)]">
             #1 Guess
           </div>
-          <div className="py-1 px-1 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[10px] font-mono-stats font-semibold text-[var(--text-secondary)]">
+          <div className="py-1 px-0.5 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[9px] font-mono-stats font-semibold text-[var(--text-secondary)]">
             #2 Tactics
           </div>
-          <div className="py-1 px-1 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[10px] font-mono-stats font-semibold text-[var(--text-secondary)]">
+          <div className="py-1 px-0.5 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[9px] font-mono-stats font-semibold text-[var(--text-secondary)]">
             #3 Puzzle
           </div>
-          <div className="py-1 px-1 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[10px] font-mono-stats font-semibold text-[var(--text-secondary)]">
+          <div className="py-1 px-0.5 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[9px] font-mono-stats font-semibold text-[var(--text-secondary)]">
             #4 Racing
+          </div>
+          <div className="py-1 px-0.5 rounded-lg bg-[var(--primary-accent-subtle)] border border-[var(--primary-accent-border)] text-[9px] font-mono-stats font-bold text-[var(--primary-accent)]">
+            #5 Strike
           </div>
         </div>
       </div>

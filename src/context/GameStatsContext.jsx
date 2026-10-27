@@ -119,6 +119,13 @@ const DEFAULT_STATS = {
     best4x4: null,
     best5x5: null,
   },
+  galaxyStrike: {
+    played: 0,
+    wins: 0,
+    highScoreSolo: 0,
+    highScoreTeam: 0,
+    highestWave: 1,
+  },
 };
 
 export const GameStatsProvider = ({ children }) => {
@@ -438,6 +445,53 @@ export const GameStatsProvider = ({ children }) => {
     [addLeaderboardEntry, unlockAchievement]
   );
 
+  // 4. Record Galaxy Strike Result (Solo / Team)
+  const recordGalaxyStrikeResult = useCallback(
+    ({ score, wave, mode, isWin }) => {
+      setStats((prev) => {
+        const nextStats = { ...prev };
+        nextStats.totalGamesPlayed += 1;
+        if (!nextStats.galaxyStrike) {
+          nextStats.galaxyStrike = { played: 0, wins: 0, highScoreSolo: 0, highScoreTeam: 0, highestWave: 1 };
+        }
+        nextStats.galaxyStrike.played += 1;
+
+        if (isWin) {
+          nextStats.totalWins += 1;
+          nextStats.galaxyStrike.wins += 1;
+          nextStats.currentStreak += 1;
+          if (nextStats.currentStreak > nextStats.bestStreak) {
+            nextStats.bestStreak = nextStats.currentStreak;
+          }
+        } else {
+          nextStats.totalLosses += 1;
+          nextStats.currentStreak = 0;
+        }
+
+        if (wave > (nextStats.galaxyStrike.highestWave || 1)) {
+          nextStats.galaxyStrike.highestWave = wave;
+        }
+
+        const scoreKey = mode === 'team' ? 'highScoreTeam' : 'highScoreSolo';
+        if (score > (nextStats.galaxyStrike[scoreKey] || 0)) {
+          nextStats.galaxyStrike[scoreKey] = score;
+        }
+
+        addLeaderboardEntry({
+          game: 'Galaxy Strike',
+          score: `${score.toLocaleString()} pts (Wave ${wave}, ${mode === 'team' ? 'Team Co-Op' : 'Solo'})`,
+          points: score,
+        });
+
+        unlockAchievement('first_blood');
+        if (nextStats.currentStreak >= 3) unlockAchievement('streak_king');
+
+        return nextStats;
+      });
+    },
+    [addLeaderboardEntry, unlockAchievement]
+  );
+
   return (
     <GameStatsContext.Provider
       value={{
@@ -450,6 +504,7 @@ export const GameStatsProvider = ({ children }) => {
         recordNumberGuessResult,
         recordTicTacToeResult,
         recordPuzzleResult,
+        recordGalaxyStrikeResult,
         unlockAchievement,
       }}
     >

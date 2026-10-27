@@ -59,46 +59,6 @@ export const NumberGuessing = ({ setCurrentView, openAuthModal }) => {
 
   const inputRef = useRef(null);
 
-  if (currentUser?.isGuest) {
-    return (
-      <div className="min-h-[70vh] flex items-center justify-center p-4">
-        <div className="max-w-md w-full surface-card rounded-3xl p-8 border border-[var(--border-color)] text-center space-y-5 shadow-2xl">
-          <div className="w-14 h-14 rounded-2xl bg-[var(--primary-accent-subtle)] border border-[var(--primary-accent-border)] text-[var(--primary-accent)] flex items-center justify-center mx-auto">
-            <Lock className="w-7 h-7" />
-          </div>
-          <div>
-            <h2 className="font-heading font-extrabold text-2xl text-[var(--text-primary)]">
-              Sign Up Required
-            </h2>
-            <p className="text-sm text-[var(--text-secondary)] mt-2 font-sans leading-relaxed">
-              You must create an account or sign in to play Number Guessing, track attempts, and compete on the leaderboard.
-            </p>
-          </div>
-          <div className="pt-2 flex flex-col sm:flex-row gap-3">
-            <button
-              onClick={() => openAuthModal && openAuthModal('signup')}
-              className="flex-1 py-3 rounded-2xl btn-primary font-bold text-sm"
-            >
-              Sign Up Free
-            </button>
-            <button
-              onClick={() => openAuthModal && openAuthModal('signin')}
-              className="flex-1 py-3 rounded-2xl btn-secondary font-bold text-sm"
-            >
-              Sign In
-            </button>
-          </div>
-          <button
-            onClick={() => setCurrentView('home')}
-            className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors underline underline-offset-4"
-          >
-            ← Back to Home
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   // Initialize new secret number
   const initGame = (diff = difficulty) => {
     const curConfig = DIFFICULTY_CONFIG[diff];
@@ -210,6 +170,47 @@ export const NumberGuessing = ({ setCurrentView, openAuthModal }) => {
       });
     }
   };
+
+  // Auth Guard for Guest Users
+  if (currentUser?.isGuest) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center p-4">
+        <div className="max-w-md w-full surface-card rounded-3xl p-8 border border-[var(--border-color)] text-center space-y-5 shadow-2xl">
+          <div className="w-14 h-14 rounded-2xl bg-[var(--primary-accent-subtle)] border border-[var(--primary-accent-border)] text-[var(--primary-accent)] flex items-center justify-center mx-auto">
+            <Lock className="w-7 h-7" />
+          </div>
+          <div>
+            <h2 className="font-heading font-extrabold text-2xl text-[var(--text-primary)]">
+              Sign Up Required
+            </h2>
+            <p className="text-sm text-[var(--text-secondary)] mt-2 font-sans leading-relaxed">
+              You must create an account or sign in to play Number Guessing, track attempts, and compete on the leaderboard.
+            </p>
+          </div>
+          <div className="pt-2 flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={() => openAuthModal && openAuthModal('signup')}
+              className="flex-1 py-3 rounded-2xl btn-primary font-bold text-sm cursor-pointer"
+            >
+              Sign Up Free
+            </button>
+            <button
+              onClick={() => openAuthModal && openAuthModal('signin')}
+              className="flex-1 py-3 rounded-2xl btn-secondary font-bold text-sm cursor-pointer"
+            >
+              Sign In
+            </button>
+          </div>
+          <button
+            onClick={() => setCurrentView('home')}
+            className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors underline underline-offset-4 cursor-pointer"
+          >
+            ← Back to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">

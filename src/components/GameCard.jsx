@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Play, ArrowRight, Trophy, Zap, Clock, Hash, Grid3X3, Car, Lock } from 'lucide-react';
+import { Play, ArrowRight, Trophy, Zap, Clock, Hash, Grid3X3, Car, Lock, Rocket } from 'lucide-react';
 import { soundEffects } from '../audio/soundEffects';
 
 export const GameCard = ({
@@ -100,6 +100,38 @@ export const GameCard = ({
               </div>
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-card)]/30 to-transparent pointer-events-none" />
+          </div>
+        );
+
+      case 'galaxy-strike':
+        return (
+          <div className="relative h-28 w-full rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-color)] overflow-hidden flex items-center justify-center mb-5">
+            {/* Retro space field with 2-Ship formation (Solo & Team) */}
+            <div className="absolute inset-0 pointer-events-none">
+              <span className="absolute top-3 left-6 w-1 h-1 bg-[var(--text-secondary)] rounded-full opacity-40" />
+              <span className="absolute top-8 right-8 w-1 h-1 bg-[var(--primary-accent)] rounded-full opacity-80" />
+              <span className="absolute bottom-5 left-12 w-1.5 h-1.5 bg-white rounded-full opacity-60" />
+              <span className="absolute top-5 left-1/2 w-1 h-1 bg-[var(--text-secondary)] rounded-full opacity-30" />
+            </div>
+            {/* Lasers */}
+            <div className="absolute top-3 left-[42%] w-0.5 h-4 bg-[var(--primary-accent)] shadow-[0_0_8px_var(--primary-accent)]" />
+            <div className="absolute top-2 left-[58%] w-0.5 h-4 bg-[#E0E7D9] shadow-[0_0_6px_#E0E7D9]" />
+            {/* Alien Drone target */}
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-[var(--bg-card)] border border-[var(--border-color)] font-mono-stats text-[9px] font-bold text-[var(--text-secondary)] tracking-widest">
+              ▼ DRONE
+            </div>
+            {/* Two Squadron Ships */}
+            <div className="flex items-center gap-6 mt-5 z-10">
+              <div className="flex flex-col items-center">
+                <Rocket className="w-6 h-6 text-[var(--primary-accent)] rotate-[-15deg]" />
+                <span className="text-[8px] font-mono-stats font-bold text-[var(--primary-accent)] mt-0.5">P1</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <Rocket className="w-6 h-6 text-[#E0E7D9] rotate-[15deg]" />
+                <span className="text-[8px] font-mono-stats font-bold text-[var(--text-secondary)] mt-0.5">P2</span>
+              </div>
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-card)]/40 to-transparent pointer-events-none" />
           </div>
         );
 
