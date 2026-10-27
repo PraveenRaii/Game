@@ -124,8 +124,3 @@ If you prefer running in two separate terminal windows:
   ```
 
 ---
-
-## 🔑 Admin Account Credentials
-- **Email**: `praveen12342020@gmail.com`
-- **Username**: `admin`
-- **Password**: `praveen@2020`
