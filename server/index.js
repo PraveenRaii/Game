@@ -123,18 +123,42 @@ const seedDatabase = async () => {
   }
 };
 
-// Database Connection
+// Database Connection with Auto-Reconnect & Resilient Options
 let isDbConnected = false;
-mongoose
-  .connect(MONGODB_URI)
-  .then(async () => {
+
+mongoose.connection.on('connected', () => {
+  isDbConnected = true;
+  console.log('MongoDB Atlas Connected successfully!');
+});
+
+mongoose.connection.on('disconnected', () => {
+  isDbConnected = false;
+  console.warn('MongoDB Atlas Disconnected');
+});
+
+mongoose.connection.on('error', (err) => {
+  isDbConnected = false;
+  console.error('MongoDB Atlas Connection Error:', err.message);
+});
+
+const connectToDatabase = async () => {
+  try {
+    await mongoose.connect(MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 10000,
+      family: 4, // Force IPv4 for reliable cloud host routing
+    });
     isDbConnected = true;
-    console.log('MongoDB Atlas Connected successfully!');
+    console.log('MongoDB Atlas Initialized!');
     await seedDatabase();
-  })
-  .catch((err) => {
-    console.error('MongoDB Connection Failed:', err.message);
-  });
+  } catch (err) {
+    isDbConnected = false;
+    console.error('MongoDB Connection Failed (will retry in 5s):', err.message);
+    setTimeout(connectToDatabase, 5000);
+  }
+};
+
+connectToDatabase();
 
 // Health & Status endpoint
 app.get('/api/health', (req, res) => {
@@ -156,6 +180,13 @@ app.post('/api/auth/register', async (req, res) => {
 
     if (!username || !password) {
       return res.status(400).json({ success: false, message: 'Username and password are required' });
+    }
+
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: 'Database connecting. Please ensure 0.0.0.0/0 is allowed in MongoDB Atlas Network Access.',
+      });
     }
 
     const cleanUsername = username.trim().toLowerCase();
@@ -193,7 +224,11 @@ app.post('/api/auth/register', async (req, res) => {
     });
   } catch (err) {
     console.error('Register error:', err);
-    res.status(500).json({ success: false, message: err.message });
+    const msg =
+      err.message && err.message.includes('buffering timed out')
+        ? 'Database connection timed out. Please allow IP 0.0.0.0/0 in MongoDB Atlas -> Network Access.'
+        : err.message;
+    res.status(500).json({ success: false, message: msg });
   }
 });
 
@@ -203,6 +238,13 @@ app.post('/api/auth/login', async (req, res) => {
     const { identifier, password } = req.body;
     if (!identifier || !password) {
       return res.status(400).json({ success: false, message: 'Please provide credentials' });
+    }
+
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: 'Database connecting. Please ensure 0.0.0.0/0 is allowed in MongoDB Atlas Network Access.',
+      });
     }
 
     const term = identifier.trim().toLowerCase();
@@ -230,7 +272,11 @@ app.post('/api/auth/login', async (req, res) => {
     });
   } catch (err) {
     console.error('Login error:', err);
-    res.status(500).json({ success: false, message: err.message });
+    const msg =
+      err.message && err.message.includes('buffering timed out')
+        ? 'Database connection timed out. Please allow IP 0.0.0.0/0 in MongoDB Atlas -> Network Access.'
+        : err.message;
+    res.status(500).json({ success: false, message: msg });
   }
 });
 
